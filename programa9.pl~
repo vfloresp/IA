@@ -1,0 +1,4 @@
+combina([],Lista,Lista):-
+        !.
+combina([X|Lista1],Lista2,[X | Lista3]):-
+
