@@ -37,8 +37,19 @@ resta([A|ColaA],[B|ColaB],[C|ColaC]):-
     restaLista(A,B,C),
     resta(ColaA,ColaB,ColaC).
 
-transpone([],[]).
-transpone([A|ColaA],[B|ColaB]):-
-         transpone(ColaA,ColaB),
+listaXelem([],[]).
+listaXelem([A|ColaA],[B|ColaB]):-
+         listaXelem(ColaA,ColaB),
          B = [A].
+
+rellenaLista(_,[]).
+rellenaLista([A|ColaA],[B|ColaB]):-
+         listaXelem(B,B),
+         append(A,B,A),
+         rellenaLista(ColaA,ColaB).
+
+
+transpone([A|ColaA],B):-
+         listaXelem(A,B),
+         rellenaLista(B,ColaA).
 
