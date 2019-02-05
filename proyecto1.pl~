@@ -13,3 +13,32 @@ comparaLong(ListaA,ListaB):-
     L2 is Y,
     L1 =:= L2.
 
+sumaLista([],[],[]).
+sumaLista([A|ColaA],[B|ColaB],[C|ColaC]):-
+         comparaLong(ColaA,ColaB),
+         sumaLista(ColaA,ColaB,ColaC),
+         C is A + B.
+
+suma([],[],[]).
+suma([A|ColaA],[B|ColaB],[C|ColaC]):-
+    comparaLong(ColaA,ColaB),
+    sumaLista(A,B,C),
+    suma(ColaA,ColaB,ColaC).
+
+restaLista([],[],[]).
+restaLista([A|ColaA],[B|ColaB],[C|ColaC]):-
+         comparaLong(ColaA,ColaB),
+         restaLista(ColaA,ColaB,ColaC),
+         C is A - B.
+
+resta([],[],[]).
+resta([A|ColaA],[B|ColaB],[C|ColaC]):-
+    comparaLong(ColaA,ColaB),
+    restaLista(A,B,C),
+    resta(ColaA,ColaB,ColaC).
+
+transpone([],[]).
+transpone([A|ColaA],[B|ColaB]):-
+         transpone(ColaA,ColaB),
+         B = [A].
+
