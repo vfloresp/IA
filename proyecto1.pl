@@ -40,17 +40,21 @@ resta([A|ColaA],[B|ColaB],[C|ColaC]):-
 
 listaXelem([],[]).
 listaXelem([A|ColaA],[B|ColaB]):-
+         write("Entro listaXelem"),nl,
          listaXelem(ColaA,ColaB),
          B = [A].
 
-rellenaLista(_,[]).
+rellenaLista([],[]).
+rellenaLista([A|[]],[B|[]]):-
+         C = B,
+         append(C,A,B).
 rellenaLista([A|ColaA],[B|ColaB]):-
-         listaXelem(B,X),
-         append(A,X,B),
+         listaXelem(A,X),
+         rellenaLista(X,B),
          rellenaLista(ColaA,ColaB).
 
-
 transpone([A|ColaA],B):-
+         write("entro transpone"),nl,
          listaXelem(A,B),
-         rellenaLista(B,ColaA).
+         rellenaLista(ColaA,B).
 
