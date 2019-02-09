@@ -44,17 +44,23 @@ listaXelem([A|ColaA],[B|ColaB]):-
          listaXelem(ColaA,ColaB),
          B = [A].
 
-rellenaLista([],[]).
-rellenaLista([A|[]],[B|[]]):-
-         C = B,
-         append(C,A,B).
-rellenaLista([A|ColaA],[B|ColaB]):-
+rellenaLista([],A,B):-
+         B=A.
+rellenaLista([A|ColaA],[B|ColaB],C):-
+         write("Entro rellana"),nl,
          listaXelem(A,X),
-         rellenaLista(X,B),
-         rellenaLista(ColaA,ColaB).
+         pegaElem([B|ColaB],X,Z),
+         rellenaLista(ColaA,Z,C).
+
+
+pegaElem([],[],[]).
+pegaElem([A|ColaA],[B|ColaB],[C|ColaC]):-
+         write("pega"),nl,
+         pegaElem(ColaA,ColaB,ColaC),
+         append(A,B,C).
 
 transpone([A|ColaA],B):-
          write("entro transpone"),nl,
-         listaXelem(A,B),
-         rellenaLista(ColaA,B).
+         listaXelem(A,X),
+         rellenaLista(ColaA,X,B).
 
