@@ -40,14 +40,12 @@ resta([A|ColaA],[B|ColaB],[C|ColaC]):-
 
 listaXelem([],[]).
 listaXelem([A|ColaA],[B|ColaB]):-
-         write("Entro listaXelem"),nl,
          listaXelem(ColaA,ColaB),
          B = [A].
 
 rellenaLista([],A,B):-
          B=A.
 rellenaLista([A|ColaA],[B|ColaB],C):-
-         write("Entro rellana"),nl,
          listaXelem(A,X),
          pegaElem([B|ColaB],X,Z),
          rellenaLista(ColaA,Z,C).
@@ -55,12 +53,30 @@ rellenaLista([A|ColaA],[B|ColaB],C):-
 
 pegaElem([],[],[]).
 pegaElem([A|ColaA],[B|ColaB],[C|ColaC]):-
-         write("pega"),nl,
          pegaElem(ColaA,ColaB,ColaC),
          append(A,B,C).
 
 transpone([A|ColaA],B):-
-         write("entro transpone"),nl,
          listaXelem(A,X),
          rellenaLista(ColaA,X,B).
+
+
+multiplica([],[],[]).
+multiplica([A|ColaA],[B|ColaB],[C|ColaC]):-
+         transpone([B],X),
+         comparaLong(A,X),
+         multiplica(A,ColaB,C),
+         multiplica(ColaA,B,ColaC),
+         multiplicaLista(A,X,Z),
+         sumaListaInterna(Z,C).
+
+multiplicaLista([],[],[]).
+multiplicaLista([A|ColaA],[B|ColaB],[C|ColaC]):-
+         multiplicaLista(ColaA,ColaB,ColaC),
+         C is A * B.
+
+sumaListaInterna([],0).
+sumaListaInterna([A|ColaA],B):-
+         sumaListaInterna(ColaA,X),
+         B is X + A.
 
