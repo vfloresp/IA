@@ -1,6 +1,22 @@
 :-dynamic matriz/3.
 
-matriz([1,2,3],1,3).
+matrizK([[ 4, 0, 1, 3],
+        [ -1, 3, 1, 2],
+        [ 5, 1, 0, -1]]).
+
+matrizL([[ 0, 2, 3, -1],
+         [ -1, 0, 2, 2],
+         [ -1, 0, -1, 1]]).
+
+matrizM([[ 1, 1],
+         [ 2, 1],
+         [ -1, 0],
+         [ 3, -2]]).
+
+matrizZ([[5,2,3],
+         [4,9,-2],
+         [12,7,4],
+         [1,5,-4]]).
 
 %Recibe una lista y regresa su longitud.
 longitud([],0).
@@ -119,4 +135,46 @@ sumaListaInterna([],0).
 sumaListaInterna([A|ColaA],B):-
          sumaListaInterna(ColaA,X),
          B is X + A.
+
+
+%Imprime de esta manera matrizK(X),matrizL(Y),suma(X,Y,Z),imprime(Z).
+% (en el caso de la suma). Pero es igual para las demás operaciones.
+imprime([]).
+
+imprime([[X|B]|C]):-
+
+    imprime([X|B]),
+    nl,
+    imprime(C).
+
+imprime([X|C]):-
+    write(" "),
+    write(X),
+    write(" "),
+    imprime(C).
+
+
+ejemploSuma:-
+     matrizK(X),
+     matrizL(Y),
+     suma(X,Y,Z),
+     imprime(Z).
+
+ejemploResta:-
+     matrizK(X),
+     matrizL(Y),
+     resta(X,Y,Z),
+     imprime(Z).
+
+ejemploTransposicion:-
+     matrizM(X),
+     transpone(X,Y),
+     imprime(Y).
+
+ejemploMultiplicacion:-
+     matrizK(X),
+     matrizZ(Y),
+     multiplica(X,Y,Z),
+     imprime(Z).
+
 
