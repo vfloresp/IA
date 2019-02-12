@@ -61,14 +61,23 @@ transpone([A|ColaA],B):-
          rellenaLista(ColaA,X,B).
 
 
-multiplica([],[],[]).
-multiplica([A|ColaA],[B|ColaB],[C|ColaC]):-
-         transpone(B,X),
-         comparaLong(A,X),
-         multiplica(A,ColaB,C),
-         multiplica(ColaA,B,ColaC),
-         multiplicaLista(A,X,Z),
+multiplicaRenglones([],[],[]).
+multiplicaRenglones([A|[]],[B|[]],C):-
+         multiplicaLista(A,B,Z),
          sumaListaInterna(Z,C).
+multiplicaRenglones([A|[]],[B|ColaB],[C|ColaC]):-
+         multiplicaRenglones([A|[]],[B|[]],C),
+         multiplicaRenglones([A|[]],ColaB,ColaC).
+
+multiplicaRenglones([A|ColaA],[B|ColaB],[C|ColaC]):-
+         multiplicaRenglones([A|[]],[B|ColaB],C),
+         multiplicaRenglones(ColaA,[B|ColaB],ColaC).
+
+
+multiplica([A|ColaA],[B|ColaB],C):-
+         transpone([B|ColaB],[X|ColaX]),
+         comparaLong(A,X),
+         multiplicaRenglones([A|ColaA],[X|ColaX],C),!.
 
 multiplicaLista([],[],[]).
 multiplicaLista([A|ColaA],[B|ColaB],[C|ColaC]):-
