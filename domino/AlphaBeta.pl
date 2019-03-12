@@ -1,4 +1,22 @@
+%Base de datos con la notación de [[6,6], costo]
 
+listaAbierta([X,Y]).
+listaFichas([[6,6],_],[[5,6],_],[[4,6],_],[[3,6],_],[[2,6],_],[[1,6],_],[[0,6],_],[[5,5],_],[[4,5],_],[[3,5],_],[[2,5],_],[[1,5],_],[[0,5],_],[[4,4],_],[[3,4],_],[[2,4],_],[[1,4],_],[[0,4],_],[[3,3],_],[[2,3],_],[[1,3],_],[[0,3],_],[[2,2],_],[[1,2],_],[[0,2],_],[[1,1],_],[[0,1],_],[[0,0],_]).
+listaEnMano().
+listaEnMesa().
+NumComer(14).
+miMano(N).
+manoOponente(M).
+
+listaIncognitas([],_,_,_):-
+    !.
+listaIncognitas(ListaFichas,ListaEnMano,ListaEnMesa,ListaIncognitos):-
+    ListaFichas = [CabezaF|ColaF],
+    (member(CabezaF,ListaEnMano) == false ->
+    append(CabezaF,ListaIncognitos,ListaIncognitos)),
+    (member(CabezaF,ListaEnMesa)== false ->
+    append(CabezaF,ListaIncognitos,ListaIncognitos)),
+    listaIncognitas(ColaF,ListaEnMano,ListaEnMesa,ListaIncognitos).
 
 %EjemploArbol is [[6,6],[[6,5],[6,4]]].%
 %BaseDatos is [[6,6],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6],[5,5],[4,5],[3,5],[2,5],[1,5],[0,5],[4,4],[3,4],[2,4],[1,4],[0,4],[3,3],[2,3],[1,3],[0,3],[2,2],[1,2],[0,2],[1,1],[0,1],[0,0]].%
@@ -9,71 +27,108 @@
 % Arbol is arbol que vamos a estar generando en el momento - se va a%
 % estar generan%do en cada turno.%
 
+alphaBeta([[_,Val]|[]],_,_,_,_,ValorH):-
+    ValorH is Val,!.
 
-alphaBeta(node,depth,alpha,beta,player):-
-    depth==0,
-    nodeValue,!.
+alphaBeta([[[_,Val]|[]]],_,_,_,_,ValorH):-
+    ValorH is Val,!.
 
-alphaBeta(node,depth,alpha,beta,player):-
-    node==terminal-sin-hijos,
-    nodeValue,!.
+alphaBeta([_|Node],0,_,_,_,ValorH):-
+    ValorH is Node,!.
 
-alphaBeta([head|children],depth,alpha,beta,player):-
-    player==1,
-    value is -5000,
-    forEachAlpha(children,value,depth,alpha,beta,valueRet),write(valueRet).
+alphaBeta([_,[Children]|Cuerpo],Depth,Alpha,Beta,Player,ValorH):-
+   alphaBeta(Children,Depth,Alpha,Beta,Player,ValorH),
+   alphaBeta(Cuerpo,Depth,Alpha,Beta,Player,ValorH),!.
 
-forEachAlpha([child1|[]],value,depth,alpha,beta,valueRet):-
-     childrenMax(child1,value,depth,alpha,beta,valueRet).
+alphaBeta([_|[Children]],Depth,Alpha,Beta,1,ValorH):-
+    Value is -5000,
+    forEachAlpha(Children,Value,Depth,Alpha,Beta,ValorH),!.
 
-forEachAlpha([child1|childrens],value,depth,alpha,beta,valueRet):-
-    childrenMax(child1,value,depth,alpha,beta,valueRet),
-    childrenMax(childrens,value,depth,alpha,beta,valueRet),!.
-
-childrenMax(children,value,depth,alpha,beta,valueRet):-
-    depthN is depth -1,
-    playerN is 0,
-    maxim(value,alphaBeta(children,depthN,alpha,beta,playerN),valueRet),
-    maxim(alpha,valueRet,alphaN),
-    compara(alphaN,beta),!.
-
-compara(alpha,beta):-
-    alpha >= beta,fail.
-
-maxim(valor1,valor2,res):-
-    valor1>valor2,
-    res = valor1,!.
-
-maxim(valor1,valor2,res):-
-    res = valor2.
+alphaBeta([_|Children],Depth,Alpha,Beta,0,ValorH):-
+    Value is 5000,
+    forEachBeta(Children,Value,Depth,Alpha,Beta,ValorH).
 
 
-alphaBeta(node,depth,alpha,beta,player):-
-    player==0,
-    value is 5000,
-    forEachBeta(children,value,depth,alpha,beta,valueRet),write(valueRet).
+forEachAlpha(_,_,_,Alpha,Beta,_):-
+    Alpha >= Beta,fail.
+
+forEachAlpha([Child1|[]],Value,Depth,Alpha,Beta,ValueRet):-
+     childrenMax(Child1,Value,Depth,Alpha,Beta,ValueRet),!.
+
+forEachAlpha([Child1|Childrens],Value,Depth,Alpha,Beta,ValueRet):-
+    childrenMax(Child1,Value,Depth,Alpha,Beta,ValueRes),
+    forEachAlpha(Childrens,Value,Depth,ValueRes,Beta,ValueRet),!.
 
 
-forEachAlpha([child1|[]],value,depth,alpha,beta,valueRet):-
-     childrenMin(child1,value,depth,alpha,beta,valueRet).
+forEachBeta(_,_,_,Alpha,Beta,_):-
+    Alpha >= Beta,fail.
 
-forEachAlpha([child1|childrens],value,depth,alpha,beta,valueRet):-
-    childrenMin(child1,value,depth,alpha,beta,valueRet),
-    childrenMin(childrens,value,depth,alpha,beta,valueRet),!.
+forEachBeta([Child1|[]],Value,Depth,Alpha,Beta,ValueRet):-
+     childrenMin(Child1,Value,Depth,Alpha,Beta,ValueRet).
 
-childrenMin(children,value,depth,alpha,beta,valueRet):-
-    depthN is depth -1,
-    playerN is 1,
-    minmin(value,alphaBeta(children,depthN,alpha,beta,playerN),valueRet),
-    minmin(alpha,valueRet,alphaN),
-    compara(alphaN,beta),!.
+forEachBeta([Child1|Childrens],Value,Depth,Alpha,Beta,ValueRet):-
+    childrenMin(Child1,Value,Depth,Alpha,Beta,ValueRes),
+    forEachBeta(Childrens,Value,Depth,Alpha,ValueRes,ValueRet),!.
 
-minmin(valor1,valor2,res):-
-    valor1<valor2,
-    res = valor1,!.
+maxim(Valor1,Valor2,Res):-
+    Valor1>Valor2,
+    Res is Valor1,!.
 
-minmin(valor1,valor2,res):-
-    res = valor2.
+maxim(_,Valor2,Res):-
+    Res is Valor2.
 
+childrenMax(Children,Value,Depth,Alpha,Beta,ValueRet):-
+    DepthN is Depth -1,
+    alphaBeta(Children,DepthN,Alpha,Beta,0,ValorH),
+    maxim(Value,ValorH,ValueRes),
+    maxim(Alpha,ValueRes,AlphaN),
+    ValueRet is AlphaN,!.
+
+minmin(Valor1,Valor2,Res):-
+    Valor1<Valor2,
+    Res is Valor1,!.
+
+minmin(_,Valor2,Res):-
+    Res is Valor2.
+
+childrenMin(Children,Value,Depth,Alpha,Beta,ValueRet):-
+    DepthN is Depth -1,
+    alphaBeta(Children,DepthN,Alpha,Beta,1,ValorH),
+    minmin(Value,ValorH,ValueRes),
+    minmin(Beta,ValueRes,AlphaN),
+    ValueRet is AlphaN,!.
+
+% Entran como parametros la lista del jugador y la lista de puntos
+% abiertos del juego
+%
+tomaUna(_,0,Player):-
+    Player is 0.
+
+tomaUna(ListaEnMano,NumComer,Player):-
+    read([[X,Y],Costo]),nl,
+    append([[X,Y],Costo],ListaEnMano,ListaEnMano),
+    b_set(NumComer,NumComer-1).
+
+buscaAbierto([],_,_,_,_):-
+    !.
+buscaAbierto([CabezaLM|ColaLM],[X|Y],ListaJugada,ListaEnMano,NumComer,Player):-
+    CabezaLM = [NumFicha|Peso],
+    (member(X,NumFicha) ->
+     NumFicha = [Num1|Num2],
+     (Num1=:=Num2 -> Peso is Num1+Num2+13),
+     (Num1=\=Num2 -> Peso is Num1+Num2),
+     append(ListaJugada,CabezaLM,ListaJugada)),
+    (((member(X,NumFicha),member(Y,NumFicha)) == false), member(Y,NumFicha) ->
+     NumFicha = [Num1|Num2], Peso is Num1+Num2,
+     append(ListaJugada,CabezaLM,ListaJugada)),
+
+    ((member(X,NumFicha) == false);(member(Y,NumFicha) == false);((member(X,NumFicha),member(Y,NumFicha)) == false) ->
+    tomaUna(ListaEnMano,NumComer,Player)),
+
+    buscaAbierto(ColaLM,[X|Y],ListaJugada,ListaEnMano,NumComer,Player).
+
+funcionYasAsi(ListaJugada,ListaAbietos,ListaJugada,ListaEnMano,NumComer,Depth,Alpha,Beta,Player,ValorH):-
+    buscaAbierto(ListaJugada,ListaAbietos,ListaJugada,ListaEnMano,NumComer,Player),
+    alphaBeta(ListaJugada,Depth,Alpha,Beta,Player,ValorH).
 
 
