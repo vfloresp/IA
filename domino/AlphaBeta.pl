@@ -1,7 +1,7 @@
 %Base de datos con la notaci�n de [[6,6], costo]
 
-% listaAbierta([X,Y]).
-% listaFichas([[6,6],_],[[5,6],_],[[4,6],_],[[3,6],_],[[2,6],_],[[1,6],_],[[0,6],_],[[5,5],_],[[4,5],_],[[3,5],_],[[2,5],_],[[1,5],_],[[0,5],_],[[4,4],_],[[3,4],_],[[2,4],_],[[1,4],_],[[0,4],_],[[3,3],_],[[2,3],_],[[1,3],_],[[0,3],_],[[2,2],_],[[1,2],_],[[0,2],_],[[1,1],_],[[0,1],_],[[0,0],_]).
+%listaAbierta([_,[_]]).
+%listaFichas([[6,6],_],[[5,6],_],[[4,6],_],[[3,6],_],[[2,6],_],[[1,6],_],[[0,6],_],[[5,5],_],[[4,5],_],[[3,5],_],[[2,5],_],[[1,5],_],[[0,5],_],[[4,4],_],[[3,4],_],[[2,4],_],[[1,4],_],[[0,4],_],[[3,3],_],[[2,3],_],[[1,3],_],[[0,3],_],[[2,2],_],[[1,2],_],[[0,2],_],[[1,1],_],[[0,1],_],[[0,0],_]).
 % listaEnMano().
 % listaEnMesa().
 % NumComer(14).
@@ -35,6 +35,31 @@ alphaBeta([[[_,Val]|[]]],_,_,_,_,ValorH):-
 
 alphaBeta([_|Node],0,_,_,_,ValorH):-
     ValorH is Node,!.
+
+
+
+alphaBeta(MisPiezas,Incognitas,Abiertas, [],Depth,Alpha,Beta,1,ValorH):-
+    generaArbol(MisPiezas,Abiertas,Hijos),
+    append(Abiertas,Hijos,Arbol),
+    alphaBeta(MisPiezas,Incognitas,Abiertas, Arbol,Depth,Alpha,Beta,1,ValorH).
+    
+alphaBeta(MisPiezas,Incognitas,Abiertas, [],Depth,Alpha,Beta,0,ValorH):-
+    generaArbol(Incognitas,Abiertas,Hijos),
+    append(Abiertas,Hijos,Arbol),
+    alphaBeta(MisPiezas,Incognitas,Abiertas, Arbol,Depth,Alpha,Beta,1,ValorH).
+
+alphaBeta(MisPiezas,Incognitas,Abiertas, [_,[Children]|Cuerpo],Depth,Alpha,Beta,Player,ValorH):-
+    alphaBeta(MisPiezas,Incognitas,Abiertas, Children,Depth,Alpha,Beta,Player,ValorH),
+    alphaBeta(MisPiezas,Incognitas,Abiertas, Cuerpo,Depth,Alpha,Beta,Player,ValorH),!.
+
+alphaBeta(_,_,_, [_|[Children]],Depth,Alpha,Beta,1,ValorH):-
+    Value is -5000,
+    forEachAlpha(Children,Value,Depth,Alpha,Beta,ValorH),!.
+
+alphaBeta(_,_,_, [_|[Children]],Depth,Alpha,Beta,0,ValorH):-
+    Value is 5000,
+    forEachBeta(Children,Value,Depth,Alpha,Beta,ValorH).
+ 
 
 alphaBeta([_,[Children]|Cuerpo],Depth,Alpha,Beta,Player,ValorH):-
    alphaBeta(Children,Depth,Alpha,Beta,Player,ValorH),
@@ -98,27 +123,31 @@ childrenMin(Children,Value,Depth,Alpha,Beta,ValueRet):-
     minmin(Beta,ValueRes,AlphaN),
     ValueRet is AlphaN,!.
 
-% Entran como parametros la lista del jugador y la lista de puntos
-% abiertos del juego
-%
-tomaUna(_,0,Player):-
-    Player is 0.
+generaArbol(Fichas,[X|[Y]],Hijos):-
+    buscaHijo(Fichas,X,[],HijosX),
+    buscaHijo(Fichas,Y,[],HijosY),
+    append(HijosX,HijosY,Hijos).
 
-buscaAbierto([],_,_,_,_):-
-    !.
-buscaAbierto([Cabeza|Cola],[X|Y],Hijos):-
-    Cabeza = [NumFicha|Peso],
+buscaHijo([],_,Parcial,Hijos):-
+    Hijos = Parcial.
+
+buscaHijo([Cabeza|Cola],X,Parcial,Hijos):-
+    Cabeza = [NumFicha|[Peso]],
+
     (member(X,NumFicha) ->
-     NumFicha = [Num1|Num2],
-     (Num1=:=Num2 -> Peso is Num1+Num2+13),
-     (Num1=\=Num2 -> Peso is Num1+Num2),
-     append(Hijos,Cabeza,Hijos)),
-    %(((member(X,NumFicha),member(Y,NumFicha)) == false), member(Y,NumFicha) ->
-    (member(Y,NumFicha) ->
-     NumFicha = [Num1|Num2], Peso is Num1+Num2,
-     append(Hijos,Cabeza,Hijos)),
-    ((member(X,NumFicha) == false);(member(Y,NumFicha) == false);((member(X,NumFicha),member(Y,NumFicha)) == false) ->
-    write("Tienes que comer")),
-    buscaAbierto(Cola,[X|Y],Hijos).
+        (NumFicha = [Num1|[Num2]],
+        (Num1=:=Num2 -> Peso is Num1+Num2+13),
+        append(Parcial,[Cabeza],P2),
+        buscaHijo(Cola,X,P2,Hijos);
+
+        NumFicha = [Num1|[Num2]],
+        Peso is Num1+Num2,
+        append(Parcial,[Cabeza],P2),
+        buscaHijo(Cola,X,P2,Hijos)));
+
+    buscaHijo(Cola,X,Parcial,Hijos),!.
+
+    
+
 
 
