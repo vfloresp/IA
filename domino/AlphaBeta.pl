@@ -27,127 +27,183 @@
 % Arbol is arbol que vamos a estar generando en el momento - se va a%
 % estar generan%do en cada turno.%
 
-alphaBeta([[_,Val]|[]],_,_,_,_,ValorH):-
-    ValorH is Val,!.
+% alphaBeta([[_,Val]|[]],_,_,_,_,ValorH):-
+%     ValorH is Val,!.
 
-alphaBeta([[[_,Val]|[]]],_,_,_,_,ValorH):-
-    ValorH is Val,!.
-
-alphaBeta([_|Node],0,_,_,_,ValorH):-
-    ValorH is Node,!.
+alphaBeta(_,_,_,Nodo,0,_,_,_,ValorH):-
+    ValorH is Nodo,!.
 
 
-
-alphaBeta(MisPiezas,Incognitas,Abiertas, [],Depth,Alpha,Beta,1,ValorH):-
+alphaBeta(MisPiezas,Incognitas,Abiertas,[[Cab]|[]],Depth,Alpha,Beta,1,ValorH,Fcont):-
     generaArbol(MisPiezas,Abiertas,Hijos),
-    append(Abiertas,Hijos,Arbol),
-    alphaBeta(MisPiezas,Incognitas,Abiertas, Arbol,Depth,Alpha,Beta,1,ValorH).
-    
-alphaBeta(MisPiezas,Incognitas,Abiertas, [],Depth,Alpha,Beta,0,ValorH):-
+    (Hijos == [] ->
+        (MisPiezas == []-> 
+        ValorH = [[Cab]|550*Depth]);
+        (ValorH = [[Cab]|0]) );
+    generaArbol(MisPiezas,Abiertas,Hijos),
+    alphaBeta(MisPiezas,Incognitas,Abiertas,[[]|Hijos],Depth,Alpha,Beta,0,ValorH,Fcont).
+
+alphaBeta(MisPiezas,Incognitas,Abiertas, [[Cab]|[]],Depth,Alpha,Beta,0,ValorH,Fcont):-
+    (Fcont =:= 0 -> 
+        ValorH = [[Cab]|-550*Depth]);
     generaArbol(Incognitas,Abiertas,Hijos),
-    append(Abiertas,Hijos,Arbol),
-    alphaBeta(MisPiezas,Incognitas,Abiertas, Arbol,Depth,Alpha,Beta,1,ValorH).
+    (Hijos == [] ->
+        ValorH = [[Cab]|100*Depth]);    
+    generaArbol(MisPiezas,Abiertas,Hijos),
+    alphaBeta(MisPiezas,Incognitas,Abiertas, [[]|Hijos],Depth,Alpha,Beta,1,ValorH,Fcont).
 
-alphaBeta(MisPiezas,Incognitas,Abiertas, [_,[Children]|Cuerpo],Depth,Alpha,Beta,Player,ValorH):-
-    alphaBeta(MisPiezas,Incognitas,Abiertas, Children,Depth,Alpha,Beta,Player,ValorH),
-    alphaBeta(MisPiezas,Incognitas,Abiertas, Cuerpo,Depth,Alpha,Beta,Player,ValorH),!.
 
-alphaBeta(_,_,_, [_|[Children]],Depth,Alpha,Beta,1,ValorH):-
-    Value is -5000,
-    forEachAlpha(Children,Value,Depth,Alpha,Beta,ValorH),!.
 
-alphaBeta(_,_,_, [_|[Children]],Depth,Alpha,Beta,0,ValorH):-
-    Value is 5000,
-    forEachBeta(Children,Value,Depth,Alpha,Beta,ValorH).
+
+% alphaBeta([[[_,Val]|[]]],_,_,_,_,ValorH):-
+%     ValorH is Val,!.
+
+% alphaBeta([_|Node],0,_,_,_,ValorH):-
+%     ValorH is Node,!.
+
+
+
+alphaBeta(MisPiezas,Incognitas,Abiertas, [],Depth,Alpha,Beta,1,ValorH,Fcont):-
+    generaArbol(MisPiezas,Abiertas,Hijos),
+    append([Abiertas],Hijos,Arbol),
+    alphaBeta(MisPiezas,Incognitas,Abiertas, Arbol,Depth,Alpha,Beta,1,ValorH,Fcont).
+    
+alphaBeta(MisPiezas,Incognitas,Abiertas, [],Depth,Alpha,Beta,0,ValorH,Fcont):-
+    generaArbol(Incognitas,Abiertas,Hijos),
+    append([Abiertas],Hijos,Arbol),
+    alphaBeta(MisPiezas,Incognitas,Abiertas, Arbol,Depth,Alpha,Beta,1,ValorH,Fcont).
+
+% alphaBeta(MisPiezas,Incognitas,Abiertas, [_,[Children]|Cuerpo],Depth,Alpha,Beta,Player,ValorH,Fcont):-
+%     alphaBeta(MisPiezas,Incognitas,Abiertas, Children,Depth,Alpha,Beta,Player,ValorH),
+%     alphaBeta(MisPiezas,Incognitas,Abiertas, Cuerpo,Depth,Alpha,Beta,Player,ValorH,Fcont),!.
+
+alphaBeta(MisPiezas,Incognitas,Abiertas, [_|Children],Depth,Alpha,Beta,1,ValorH,Fcont):-
+    Value = [[]|Alpha],
+    forEachAlpha(MisPiezas,Incognitas,Abiertas,Children,Value,Depth,Alpha,Beta,ValorH,Fcont),!.
+
+alphaBeta(MisPiezas,Incognitas,Abiertas,[_|Children],Depth,Alpha,Beta,0,ValorH,Fcont):-
+    Value = [[]|Beta],
+    forEachBeta(MisPiezas,Incognitas,Abiertas,Children,Value,Depth,Alpha,Beta,ValorH,Fcont).
  
 
-alphaBeta([_,[Children]|Cuerpo],Depth,Alpha,Beta,Player,ValorH):-
-   alphaBeta(Children,Depth,Alpha,Beta,Player,ValorH),
-   alphaBeta(Cuerpo,Depth,Alpha,Beta,Player,ValorH),!.
+% alphaBeta(MisPiezas,Incognitas,Abiertas,[_,[Children]|Cuerpo],Depth,Alpha,Beta,Player,ValorH,Fcont):-
+%    alphaBeta(MisPiezas,Incognitas,Abiertas,Children,Depth,Alpha,Beta,Player,ValorH,Fcont),
+%    alphaBeta(MisPiezas,Incognitas,Abiertas,Cuerpo,Depth,Alpha,Beta,Player,ValorH,Fcont),!.
 
-alphaBeta([_|[Children]],Depth,Alpha,Beta,1,ValorH):-
-    Value is -5000,
-    forEachAlpha(Children,Value,Depth,Alpha,Beta,ValorH),!.
+% alphaBeta([_|[Children]],Depth,Alpha,Beta,1,ValorH):-
+%     Value is -5000,
+%     forEachAlpha(Children,Value,Depth,Alpha,Beta,ValorH),!.
 
-alphaBeta([_|Children],Depth,Alpha,Beta,0,ValorH):-
-    Value is 5000,
-    forEachBeta(Children,Value,Depth,Alpha,Beta,ValorH).
+% alphaBeta([_|Children],Depth,Alpha,Beta,0,ValorH):-
+%     Value is 5000,
+%     forEachBeta(Children,Value,Depth,Alpha,Beta,ValorH).
 
 
-forEachAlpha(_,_,_,Alpha,Beta,_):-
+forEachAlpha(_,_,_,_,_,Alpha,Beta,_,_):-
     Alpha >= Beta,fail.
 
-forEachAlpha([Child1|[]],Value,Depth,Alpha,Beta,ValueRet):-
-     childrenMax(Child1,Value,Depth,Alpha,Beta,ValueRet),!.
+forEachAlpha(MisPiezas,Incognitas,Abiertas,[Child1|[]],Value,Depth,Alpha,Beta,ValueRet,Fcont):-
+     childrenMax(MisPiezas,Incognitas,Abiertas,Child1,Value,Depth,Alpha,Beta,ValueRet,Fcont),!.
 
-forEachAlpha([Child1|Childrens],Value,Depth,Alpha,Beta,ValueRet):-
-    childrenMax(Child1,Value,Depth,Alpha,Beta,ValueRes),
-    forEachAlpha(Childrens,Value,Depth,ValueRes,Beta,ValueRet),!.
+forEachAlpha(MisPiezas,Incognitas,Abiertas,[Child1|Childrens],Value,Depth,Alpha,Beta,ValueRet,Fcont):-
+    childrenMax(MisPiezas,Incognitas,Abiertas,Child1,Value,Depth,Alpha,Beta,ValueRes,Fcont),
+    forEachAlpha(MisPiezas,Incognitas,Abiertas,Childrens,Value,Depth,ValueRes,Beta,ValueRet,Fcont),!.
 
 
-forEachBeta(_,_,_,Alpha,Beta,_):-
+forEachBeta(_,_,_,_,_,Alpha,Beta,_,_):-
     Alpha >= Beta,fail.
 
-forEachBeta([Child1|[]],Value,Depth,Alpha,Beta,ValueRet):-
-     childrenMin(Child1,Value,Depth,Alpha,Beta,ValueRet).
+forEachBeta(MisPiezas,Incognitas,Abiertas,[Child1|[]],Value,Depth,Alpha,Beta,ValueRet,Fcont):-
+     childrenMin(MisPiezas,Incognitas,Abiertas,Child1,Value,Depth,Alpha,Beta,ValueRet,Fcont).
 
-forEachBeta([Child1|Childrens],Value,Depth,Alpha,Beta,ValueRet):-
-    childrenMin(Child1,Value,Depth,Alpha,Beta,ValueRes),
-    forEachBeta(Childrens,Value,Depth,Alpha,ValueRes,ValueRet),!.
+forEachBeta(MisPiezas,Incognitas,Abiertas,[Child1|Childrens],Value,Depth,Alpha,Beta,ValueRet,Fcont):-
+    childrenMin(MisPiezas,Incognitas,Abiertas,Child1,Value,Depth,Alpha,Beta,ValueRes,Fcont),
+    forEachBeta(MisPiezas,Incognitas,Abiertas,Childrens,Value,Depth,Alpha,ValueRes,ValueRet,Fcont),!.
 
-maxim(Valor1,Valor2,Res):-
+maxim([Pieza|Valor1],[_|Valor2],Res):-
     Valor1>Valor2,
-    Res is Valor1,!.
+    Res is [Pieza|Valor1],!.
 
-maxim(_,Valor2,Res):-
-    Res is Valor2.
+maxim(_,[Pieza2|Valor2],Res):-
+    Res is [Pieza2|Valor2].
 
-childrenMax(Children,Value,Depth,Alpha,Beta,ValueRet):-
+childrenMax(MisPiezas,Incognitas,Abiertas,Children,Value,Depth,Alpha,Beta,ValueRet,Fcont):-
+    Abiertas = [A1,A2],
+    Children = [[Num1,Num2]|_],
+    ((A1 =:= Num1 -> 
+        Nabiertas = [Num2,A2]);
+
+    Children = [[Num1,Num2]|_],
+    Abiertas = [A1,A2],
+    (Nabiertas = [A1,Num2])),
+
     DepthN is Depth -1,
-    alphaBeta(Children,DepthN,Alpha,Beta,0,ValorH),
+    alphaBeta(MisPiezas,Incognitas,Nabiertas,[],DepthN,Value,Beta,0,ValorH,Fcont),
     maxim(Value,ValorH,ValueRes),
     maxim(Alpha,ValueRes,AlphaN),
     ValueRet is AlphaN,!.
 
-minmin(Valor1,Valor2,Res):-
+minmin([Pieza|Valor1],Valor2,Res):-
     Valor1<Valor2,
-    Res is Valor1,!.
+    Res is [Pieza|Valor1],!.
 
 minmin(_,Valor2,Res):-
     Res is Valor2.
 
-childrenMin(Children,Value,Depth,Alpha,Beta,ValueRet):-
+childrenMin(MisPiezas,Incognitas,Abiertas,Children,Value,Depth,Alpha,Beta,ValueRet,Fcont):-
+    Children = [[Num1,Num2]|_],
+    Abiertas = [A1,A2],
+    ((A1 =:= Num1 -> 
+        Nabiertas = [Num2,A2]);
+
+    Children = [[Num1,Num2]|_],
+    Abiertas = [A1,A2],
+    (Nabiertas = [A1,Num2])),
+
     DepthN is Depth -1,
-    alphaBeta(Children,DepthN,Alpha,Beta,1,ValorH),
+    Nfcont is Fcont - 1,
+    alphaBeta(MisPiezas,Incognitas,Nabiertas,[],DepthN,Alpha,Value,1,ValorH,Nfcont),
     minmin(Value,ValorH,ValueRes),
     minmin(Beta,ValueRes,AlphaN),
     ValueRet is AlphaN,!.
 
 generaArbol(Fichas,[X|[Y]],Hijos):-
+    % (X =\= Y ->
     buscaHijo(Fichas,X,[],HijosX),
     buscaHijo(Fichas,Y,[],HijosY),
     append(HijosX,HijosY,Hijos).
+    % buscaHijo(Fichas,X,[],HijosX),
+    % append(HijosX,Hijos,Hijos).
 
 buscaHijo([],_,Parcial,Hijos):-
     Hijos = Parcial.
 
 buscaHijo([Cabeza|Cola],X,Parcial,Hijos):-
     Cabeza = [NumFicha|[Peso]],
-
     (member(X,NumFicha) ->
         (NumFicha = [Num1|[Num2]],
+        
         (Num1=:=Num2 -> Peso is Num1+Num2+13),
-        append(Parcial,[Cabeza],P2),
+        cambiarHijos([[Num1|[Num2]]|Peso],X,Res),
+        append(Parcial,[Res],P2),
         buscaHijo(Cola,X,P2,Hijos);
 
         NumFicha = [Num1|[Num2]],
         Peso is Num1+Num2,
-        append(Parcial,[Cabeza],P2),
+        cambiarHijos([[Num1|[Num2]]|Peso],X,Res),
+        append(Parcial,[Res],P2),
         buscaHijo(Cola,X,P2,Hijos)));
 
     buscaHijo(Cola,X,Parcial,Hijos),!.
 
     
+cambiarHijos([[Num1|[Num2]]|Peso],X,Res):-
+    Num1 =:= X,
+    Res = [[Num1|[Num2]],Peso],!.
+
+cambiarHijos([[Num1|[Num2]]|Peso],_,Res):-
+    Res = [[Num2|[Num1]],Peso].
+
 
 
 
