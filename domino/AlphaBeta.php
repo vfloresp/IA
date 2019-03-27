@@ -28,8 +28,9 @@
     if(substr($output[0],0,22)=="Sin fichas disponibles"){
         $output[0] ="Sin fichas disponibles";
     }else{
-        $output[0]= substr($output[0],-12,5);
-        preg_match_all('!\d+!', $output[0], $matches);
+        //$output[0]= substr($output[0],-12,5);
+        preg_match_all('!\d+!', substr($output[0],-12,5), $matches);
+        $output = $matches;
     }
     print_r(json_encode( $output) );
 

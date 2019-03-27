@@ -28,10 +28,11 @@ function newGame(){
         'Pieza 7'
         ]).then((result) => {
         if (result.value) {
-            result.value.forEach(pieza => {
-                mis_piezas.push([parseInt(pieza.substring(0,1)),parseInt(pieza.substring(2))]);
-                eliminaPieza(incognitas,[parseInt(pieza.substring(0,1)),parseInt(pieza.substring(2))]);
-                agregaFichas(pieza);
+                result.value.forEach(pieza => {
+                    piezaN = ordenaPiezas([pieza.substring(0,1),pieza.substring(2)]);
+                    mis_piezas.push(piezaN);
+                    eliminaPieza(incognitas,piezaN);
+                    agregaFichas(piezaN);
             });
             primerTiro();
         }
@@ -39,10 +40,10 @@ function newGame(){
 };
 
 function agregaFichas(ficha){
-    $(".contPiezas").append('<li class="'+ficha.substring(0,1)+ficha.substring(2)+'">'+ficha+'</li>');
+    $(".contPiezas").append('<li class="'+ficha[0]+' , '+ ficha[1]+'">'+ficha+'</li>');
 }
 function eliminaMisFichas(ficha){
-    $("."+ficha.substring(0,1)+ficha.substring(2)).remove();
+    $("."+ficha[0].toString()+ficha[1].toString()).remove();
 }
 function agregaMiTiro(ficha){
     $(".miTiro").empty();
@@ -69,7 +70,8 @@ function primerTiro(){
                     agregaMiTiro(result.value)
                     eliminaPieza(mis_piezas,[parseInt(result.value.substring(0,1)),parseInt(result.value.substring(2))]);
                     abiertas = [parseInt(result.value.substring(0,1)),parseInt(result.value.substring(2))];
-                    eliminaMisFichas(result.value);
+                    piezaN = ordenaPiezas([parseInt(result.value.substring(0,1)),parseInt(result.value.substring(2))])
+                    eliminaMisFichas(piezaN);
                 }
             })
         }else{
@@ -217,25 +219,25 @@ function ejecutarAlphaBeta(){
         }else{
             param.depth = 4;
             $.post("http://95.216.205.0/AlphaBeta.php",JSON.stringify(param),function(data2,status){
-                console.log(data2);
+                //console.log(data2);
                 if(data2[0]!="Sin fichas disponibles"){
                     actualizaMisFichas(data2[0]);
                 }else{
                     param.depth = 3;
                     $.post("http://95.216.205.0/AlphaBeta.php",JSON.stringify(param),function(data3,status){
-                        console.log(data3);
+                        //console.log(data3);
                         if(data3[0]!="Sin fichas disponibles"){
                             actualizaMisFichas(data3[0]);
                         }else{
                             param.depth = 2;
                             $.post("http://95.216.205.0/AlphaBeta.php",JSON.stringify(param),function(data4,status){
-                                console.log(data4);
+                                //console.log(data4);
                                 if(data4[0]!="Sin fichas disponibles"){
                                     actualizaMisFichas(data4[0]);
                                 }else{
                                     param.depth = 1;
                                     $.post("http://95.216.205.0/AlphaBeta.php",JSON.stringify(param),function(data5,status){
-                                        console.log(data5);
+                                        //console.log(data5);
                                         actualizaMisFichas(data5[0]);
                                     }),"json";
                                 }
@@ -250,9 +252,11 @@ function ejecutarAlphaBeta(){
 
 function actualizaMisFichas(ficha){
     console.log(ficha);
-    eliminaPieza(mis_piezas,[parseInt(ficha.substring(0,1)),parseInt(ficha.substring(2))]);
-    actualizaAbiertas([parseInt(ficha.substring(0,1)),parseInt(ficha.substring(2))]);
-    agregaMiTiro(ficha);
+    fichaN = ordenaPiezas(ficha);
+    eliminaPieza(mis_piezas,fichaN);
+    actualizaAbiertas([parseInt(ficha[0]),parseInt(ficha[1])]);
+    eliminaMisFichas(fichaN);
+    agregaMiTiro(fichaN);
     if(mis_piezas.length == 0){
         Swal.fire(
             'Felicidades!',
@@ -282,8 +286,8 @@ function actualizaAbiertas(tiro)
 }
 
 function ordenaPiezas(pieza){
-    if( parseInt(pieza.substring(0,1)) < parseInt(pieza.substring(2))){
-        pieza = "["+pieza.substring(2)+","+pieza.substring(0,1)+"]";
+    if( parseInt(pieza[0]) < parseInt(pieza[1])){
+        pieza = [pieza[1],pieza[0]];
     };
     return pieza;
 }
@@ -321,7 +325,8 @@ function fichasComidas(value){
                             agregaMiTiro(pieza);
                         }else{
                             mis_piezas.push([parseInt(pieza.substring(0,1)),parseInt(pieza.substring(2))]);
-                            agregaFichas(pieza);
+                            piezaN = ordenaPiezas([parseInt(pieza.substring(0,1)),parseInt(pieza.substring(2))]);
+                            agregaFichas(piezaN);
                         }
                         eliminaPieza(incognitas,[parseInt(pieza.substring(0,1)),parseInt(pieza.substring(2))]);
                     });
