@@ -30,7 +30,7 @@
     }else{
         //$output[0]= substr($output[0],-12,5);
         preg_match_all('!\d+!', substr($output[0],-12,5), $matches);
-        $output = [intval($matches[0]),intval($matches[1])];
+        $output = $matches;
 
     }
     print_r(json_encode( $output) );

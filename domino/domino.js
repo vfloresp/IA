@@ -19,7 +19,7 @@ function agregaMiTiro(ficha){
 
 function eliminaPieza(lista,pieza){
     var aux = 0;var flag = false;
-    while(aux < lista.lenght && !flag){
+    while(aux < lista.length && !flag){
         if(lista[aux][0]==pieza[0] && lista[aux][1] == pieza[1]){
             lista.splice(aux,1);
             flag = true;
@@ -61,12 +61,13 @@ function ordenaPiezas(pieza){
 }
 
 function actualizaMisFichas(ficha){
-    console.log(ficha);
-    piezaOrd = ordenaPiezas(ficha);
+    //console.log(ficha);
+    pieza = [parseInt(ficha[0]),parseInt(ficha[1])];
+    piezaOrd = ordenaPiezas(pieza);
     eliminaPieza(mis_piezas,piezaOrd);
     actualizaAbiertas(piezaOrd);
     eliminaMisFichas(piezaOrd);
-    agregaMiTiro(ficha);
+    agregaMiTiro(pieza);
     if(mis_piezas.length == 0){
         Swal.fire(
             'Felicidades!',
