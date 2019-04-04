@@ -147,12 +147,14 @@ forEachBeta(_,_,_,_,_,Alpha,Beta,_,_,_):-
 % �ltimo forEach de Beta realizado para la b�squeda, entra a este m�todo
 % cuando solo queda un nodo por explorar y por eso solo llama una vez a
 % childrenMin
-forEachBeta(MisPiezas,Incognitas,Abiertas,[Child1|[]],Depth,Alpha,Beta,_,Fcont,ValueRet):-
+forEachBeta(MisPiezas,Incognitas,Abiertas,[Child1|[]],Depth,Alpha,Nalpha,ValorH,Fcont,ValueRet):-
     eliminaPieza(MisPiezas,Child1,MisPiezasN),
     nuevaAbiertas(Abiertas,Child1,AbiertasN),
     Ndepth is Depth-1,
     Nfcont is Fcont-1,
-    alphaBeta(MisPiezasN,Incognitas,AbiertasN,[Child1|[]],Ndepth,Alpha,Beta,1,ValueRet,Nfcont).
+    alphaBeta(MisPiezasN,Incognitas,AbiertasN,[Child1|[]],Ndepth,Alpha,Beta,1,ValorAlphaBeta,Nfcont),
+    min(ValorH,ValorAlphaBeta,Nalpha),
+    min([Child1,Alpha],Nalpha,ValueRet),!.
 
 
 % El forEach de Beta manda a llamar a childrenMin para empezar a
@@ -160,22 +162,24 @@ forEachBeta(MisPiezas,Incognitas,Abiertas,[Child1|[]],Depth,Alpha,Beta,_,Fcont,V
 % fichas que puede tirar, es decir, las que coinciden con los puntos
 % abiertos del juego.
 forEachBeta(MisPiezas,Incognitas,Abiertas,[Child1|Children],Depth,Alpha,Beta,ValorH,Fcont,ValueRet):-
+    forEachBeta(MisPiezas,Incognitas,Abiertas,Children,Depth,Alpha,Nalpha,ValorH,Fcont,NValueRet),
     eliminaPieza(MisPiezas,Child1,MisPiezasN),
     nuevaAbiertas(Abiertas,Child1,AbiertasN),
     Ndepth is Depth-1,
     Nfcont is Fcont-1,
-    alphaBeta(MisPiezasN,Incognitas,AbiertasN,[Child1|[]],Ndepth,Alpha,Beta,1,ValueRet,Nfcont),
-    forEachBeta(MisPiezas,Incognitas,Abiertas,Children,Depth,Alpha,Beta,ValorH,Fcont,ValueRet),!.
+    alphaBeta(MisPiezasN,Incognitas,AbiertasN,[Child1|[]],Ndepth,Nalpha,Beta,1,ValorAlphaBeta,Nfcont),
+    min(NValueRet,ValorAlphaBeta,ValorMax),
+    min([Child1,Alpha],ValorMax,ValueRet),!.
 
 
 %Predicado que elige el m�ximo entre dos valores dados como nodos.
-maxim([Pieza|[Valor1]],[_|[Valor2]],Res):-
+max([Pieza|[Valor1]],[_|[Valor2]],Res):-
     Valor1>=Valor2,
     Res = [Pieza|Valor1],!.
 
 
 %Predicado que asigna a Res el valor m�ximmo encontrado.
-maxim(_,Valor2,Res):-
+max(_,Valor2,Res):-
     Res = Valor2.
 
 
@@ -223,13 +227,13 @@ childrenMax(MisPiezas,Incognitas,Abiertas,Children,Value,Depth,Alpha,Beta,ValueR
 
 
 %Predicado que elige el m�nimo entre dos valores dados como nodos.
-minmin([Pieza|[Valor1]],[_|[Valor2]],Res):-
+min([Pieza|[Valor1]],[_|[Valor2]],Res):-
     Valor1=<Valor2,
     Res = [Pieza|Valor1],!.
 
 
 %Predicado que asigna a Res el valor m�nimo encontrado.
-minmin(_,Valor2,Res):-
+min(_,Valor2,Res):-
     Res = Valor2.
 
 
