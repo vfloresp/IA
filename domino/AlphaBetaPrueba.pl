@@ -93,26 +93,6 @@ alphaBeta(MisPiezas,Incognitas,Abiertas, [Head|[]],Depth,Alpha,Beta,0,ValorH,Fco
     alphaBeta(MisPiezas,Incognitas,Abiertas, Arbol,Depth,Alpha,Beta,0,ValorH,Fcont).
 
 
-% Manda a llamar al forEach de Alpha con el �rbol generado con las
-% piezas posibles de poner en el tiro correspondiente, es decir, las
-% que coinciden en los puntos abiertos. Al final, el resultado del
-% forEach lo agrega a una lista para regresar todas las piezas elegidas
-% del camino hasta la profundidad dada.
-%alphaBeta(MisPiezas,Incognitas,Abiertas, [_|Children],Depth,Alpha,Beta,1,ValorH,Fcont):-
-%    generaArbol(MisPiezas,Abiertas,Hijos),
- %   forEachAlpha(MisPiezas,Incognitas,Abiertas,Children,Depth,Alpha,Beta,ValorH,Fcont,ValueRet),!.
-
-
-% Manda a llamar al forEach de Beta con el �rbol generado con las piezas
-% posibles de poner en el tiro correspondiente, es decir, las que
-% coinciden en los puntos abiertos. Al final, el resultado del forEach
-% lo agrega a una lista para regresar todas las piezas elegidas del
-% camino hasta la profundidad dada.
-%alphaBeta(MisPiezas,Incognitas,Abiertas,[_|Children],Depth,Alpha,Beta,0,NValorH,Fcont):-
-%    Value = Beta,
-%    forEachBeta(MisPiezas,Incognitas,Abiertas,Children,Depth,Alpha,Beta,ValorH,Fcont,ValueRet),
-%    append([ValorH],Camino, NValorH),!.
-
 %Poda la rama sobrante del �rbol (creo que tampoco lo usamos Gabs)
 forEachAlpha(_,_,_,_,_,Alpha,Beta,_,_,_):-
     Alpha >= Beta,fail.
@@ -171,6 +151,15 @@ forEachBeta(MisPiezas,Incognitas,Abiertas,[Child1|Children],Depth,Alpha,Beta,Val
     min(NValueRet,ValorAlphaBeta,ValorMax),
     min([Child1,Alpha],ValorMax,ValueRet),!.
 
+eliminaPieza([[X,Y],ColaIni],[ElimX,ElimY],Resultado):-
+    (X=:=ElimX->
+        (Y=:=ElimY->
+            Resultado = ColaIni,
+            );
+        );
+    eliminaPieza(ColaIni,Eliminar,ColaRes),
+    Resultado = [[X,Y],ColaRes].
+
 
 %Predicado que elige el m�ximo entre dos valores dados como nodos.
 max([Pieza|[Valor1]],[_|[Valor2]],Res):-
@@ -183,49 +172,6 @@ max(_,Valor2,Res):-
     Res = Valor2.
 
 
-% Predicado que escoge el nodo con peso mayor para elegirlo como mejor
-% ficha para tirar en el turno correspondiente. Adem�s, cambia los
-% puntos abiertos del juego para que al seguir buscando se actualicen
-% las piezas disponibles para cada turno del juego. Este m�todo detecta
-% cuando la profundidad del �rbol es 0, es decir, nos encontramos en un
-% nodo hoja, por lo que empieza es escoger entre los valores de los
-% nodos el de mayor peso para tirar en el turno.
-childrenMax(MisPiezas,Incognitas,Abiertas,Children,Value,Depth,Alpha,Beta,ValueRet,Fcont):-
-    Abiertas = [A1,A2],
-    Children = [[Num1,Num2]|_],
-    ((A1 =:= Num1 ->
-        Nabiertas = [Num2,A2]);
-
-    Children = [[Num1,Num2]|_],
-    Abiertas = [A1,A2],
-    (Nabiertas = [A1,Num2])),
-
-    DepthN is Depth -1,
-
-    (DepthN=\=0 ->
-    alphaBeta(MisPiezas,Incognitas,Nabiertas,[],DepthN,Value,Beta,0,ValorH,Fcont),
-    maxim(Value,ValorH,ValueRes),
-    maxim(Alpha,ValueRes,AlphaN),
-    ValueRet = AlphaN,!);
-
-    DepthN is Depth -1,
-    (DepthN=:=0 ->
-     Abiertas = [A1,A2],
-    Children = [[Num1,Num2]|_],
-    ((A1 =:= Num1 ->
-        Nabiertas = [Num2,A2]);
-
-    Children = [[Num1,Num2]|_],
-    Abiertas = [A1,A2],
-    (Nabiertas = [A1,Num2])),
-
-     alphaBeta(MisPiezas,Incognitas,Nabiertas,Children,DepthN,Value,Beta,0,ValorH,Fcont),
-
-    maxim(Value,ValorH,ValueRes),
-    maxim(Alpha,ValueRes,AlphaN),
-    ValueRet = AlphaN,!).
-
-
 %Predicado que elige el m�nimo entre dos valores dados como nodos.
 min([Pieza|[Valor1]],[_|[Valor2]],Res):-
     Valor1=<Valor2,
@@ -235,64 +181,6 @@ min([Pieza|[Valor1]],[_|[Valor2]],Res):-
 %Predicado que asigna a Res el valor m�nimo encontrado.
 min(_,Valor2,Res):-
     Res = Valor2.
-
-
-% Predicado que escoge el nodo con peso menor para elegirlo como mejor
-% ficha para tirar del oponente en el turno correspondiente. Adem�s,
-% cambia los puntos abiertos del juego para que al seguir buscando se
-% actualicen las piezas disponibles para cada turno del juego. Este
-% m�todo detecta cuando la profundidad del �rbol es 0, es decir, nos
-% encontramos en un nodo hoja, por lo que empieza es escoger entre los
-% valores de los nodos el de menor peso para tirar en el turno.
-childrenMin(MisPiezas,Incognitas,Abiertas,Children,Value,Depth,Alpha,Beta,ValueRet,Fcont):-
-    Children = [[Num1,Num2]|_],
-    Abiertas = [A1,A2],
-    ((A1 =:= Num1 ->
-        Nabiertas = [Num2,A2]);
-
-    Children = [[Num1,Num2]|_],
-    Abiertas = [A1,A2],
-    (Nabiertas = [A1,Num2])),
-
-    DepthN is Depth -1,
-    Nfcont is Fcont - 1,
-
-    (DepthN=\=0 ->  alphaBeta(MisPiezas,Incognitas,Nabiertas,[],DepthN,Alpha,Value,1,ValorH,Nfcont),
-    minmin(Value,ValorH,ValueRes),
-    minmin(Beta,ValueRes,BetaN),
-    ValueRet = BetaN,!);
-
-    DepthN is Depth -1,
-    (DepthN=:=0 ->
-    Children = [[Num1,Num2]|_],
-    Abiertas = [A1,A2],
-    ((A1 =:= Num1 ->
-        Nabiertas = [Num2,A2]);
-
-    Children = [[Num1,Num2]|_],
-    Abiertas = [A1,A2],
-    (Nabiertas = [A1,Num2])),
-
-
-    Nfcont is Fcont - 1,
-    alphaBeta(MisPiezas,Incognitas,Nabiertas,Children,DepthN,Alpha,Value,1,ValorH,Nfcont),
-
-    minmin(Value,ValorH,ValueRes),
-    minmin(Beta,ValueRes,BetaN),
-    ValueRet = BetaN,!).
-
-
-% Determina si el �rbol generado es vac�o, si es as�, significa que no
-% tenemos fichas disponibles que tirar, por lo que se tiene que tomar
-% una o pasar de turno.
-%conHijos([]):-
-%   write("Sin fichas disponibles").
-
-
-% Predicado que determina si el �rbol generado no es vac�o, si es as�,
-% continua con el resto del m�todo.
-%conHijos(_).
-
 
 % Predicado que genera el �rbol con las fichas que podemos tirar en el
 % turno correspondiente de acuerdo a los puntos abiertos del juego.
@@ -340,6 +228,138 @@ cambiarHijos([[Num1|[Num2]]|_],X,Res):-
 % Lo deja igual si ya est� acomodado correctamente.
 cambiarHijos([[Num1|[Num2]]|_],_,Res):-
     Res = [[Num2|[Num1]],_].
+
+
+
+
+
+
+
+% Manda a llamar al forEach de Alpha con el �rbol generado con las
+% piezas posibles de poner en el tiro correspondiente, es decir, las
+% que coinciden en los puntos abiertos. Al final, el resultado del
+% forEach lo agrega a una lista para regresar todas las piezas elegidas
+% del camino hasta la profundidad dada.
+%alphaBeta(MisPiezas,Incognitas,Abiertas, [_|Children],Depth,Alpha,Beta,1,ValorH,Fcont):-
+%    generaArbol(MisPiezas,Abiertas,Hijos),
+ %   forEachAlpha(MisPiezas,Incognitas,Abiertas,Children,Depth,Alpha,Beta,ValorH,Fcont,ValueRet),!.
+
+
+% Manda a llamar al forEach de Beta con el �rbol generado con las piezas
+% posibles de poner en el tiro correspondiente, es decir, las que
+% coinciden en los puntos abiertos. Al final, el resultado del forEach
+% lo agrega a una lista para regresar todas las piezas elegidas del
+% camino hasta la profundidad dada.
+%alphaBeta(MisPiezas,Incognitas,Abiertas,[_|Children],Depth,Alpha,Beta,0,NValorH,Fcont):-
+%    Value = Beta,
+%    forEachBeta(MisPiezas,Incognitas,Abiertas,Children,Depth,Alpha,Beta,ValorH,Fcont,ValueRet),
+%    append([ValorH],Camino, NValorH),!.
+
+
+
+% Predicado que escoge el nodo con peso mayor para elegirlo como mejor
+% ficha para tirar en el turno correspondiente. Adem�s, cambia los
+% puntos abiertos del juego para que al seguir buscando se actualicen
+% las piezas disponibles para cada turno del juego. Este m�todo detecta
+% cuando la profundidad del �rbol es 0, es decir, nos encontramos en un
+% nodo hoja, por lo que empieza es escoger entre los valores de los
+% nodos el de mayor peso para tirar en el turno.
+%childrenMax(MisPiezas,Incognitas,Abiertas,Children,Value,Depth,Alpha,Beta,ValueRet,Fcont):-
+%    Abiertas = [A1,A2],
+%    Children = [[Num1,Num2]|_],
+%    ((A1 =:= Num1 ->
+%        Nabiertas = [Num2,A2]);
+
+%    Children = [[Num1,Num2]|_],
+   /*  Abiertas = [A1,A2],
+    (Nabiertas = [A1,Num2])),
+
+    DepthN is Depth -1,
+
+    (DepthN=\=0 ->
+    alphaBeta(MisPiezas,Incognitas,Nabiertas,[],DepthN,Value,Beta,0,ValorH,Fcont),
+    maxim(Value,ValorH,ValueRes),
+    maxim(Alpha,ValueRes,AlphaN),
+    ValueRet = AlphaN,!);
+
+    DepthN is Depth -1,
+    (DepthN=:=0 ->
+     Abiertas = [A1,A2],
+    Children = [[Num1,Num2]|_],
+    ((A1 =:= Num1 ->
+        Nabiertas = [Num2,A2]);
+
+    Children = [[Num1,Num2]|_],
+    Abiertas = [A1,A2],
+    (Nabiertas = [A1,Num2])),
+
+     alphaBeta(MisPiezas,Incognitas,Nabiertas,Children,DepthN,Value,Beta,0,ValorH,Fcont),
+
+    maxim(Value,ValorH,ValueRes),
+    maxim(Alpha,ValueRes,AlphaN),
+    ValueRet = AlphaN,!). */
+
+
+
+
+% Predicado que escoge el nodo con peso menor para elegirlo como mejor
+% ficha para tirar del oponente en el turno correspondiente. Adem�s,
+% cambia los puntos abiertos del juego para que al seguir buscando se
+% actualicen las piezas disponibles para cada turno del juego. Este
+% m�todo detecta cuando la profundidad del �rbol es 0, es decir, nos
+% encontramos en un nodo hoja, por lo que empieza es escoger entre los
+/* % valores de los nodos el de menor peso para tirar en el turno.
+childrenMin(MisPiezas,Incognitas,Abiertas,Children,Value,Depth,Alpha,Beta,ValueRet,Fcont):-
+    Children = [[Num1,Num2]|_],
+    Abiertas = [A1,A2],
+    ((A1 =:= Num1 ->
+        Nabiertas = [Num2,A2]);
+
+    Children = [[Num1,Num2]|_],
+    Abiertas = [A1,A2],
+    (Nabiertas = [A1,Num2])),
+
+    DepthN is Depth -1,
+    Nfcont is Fcont - 1,
+
+    (DepthN=\=0 ->  alphaBeta(MisPiezas,Incognitas,Nabiertas,[],DepthN,Alpha,Value,1,ValorH,Nfcont),
+    minmin(Value,ValorH,ValueRes),
+    minmin(Beta,ValueRes,BetaN),
+    ValueRet = BetaN,!);
+
+    DepthN is Depth -1,
+    (DepthN=:=0 ->
+    Children = [[Num1,Num2]|_],
+    Abiertas = [A1,A2],
+    ((A1 =:= Num1 ->
+        Nabiertas = [Num2,A2]);
+
+    Children = [[Num1,Num2]|_],
+    Abiertas = [A1,A2],
+    (Nabiertas = [A1,Num2])),
+
+
+    Nfcont is Fcont - 1,
+    alphaBeta(MisPiezas,Incognitas,Nabiertas,Children,DepthN,Alpha,Value,1,ValorH,Nfcont),
+
+    minmin(Value,ValorH,ValueRes),
+    minmin(Beta,ValueRes,BetaN),
+    ValueRet = BetaN,!).
+ */
+
+% Determina si el �rbol generado es vac�o, si es as�, significa que no
+% tenemos fichas disponibles que tirar, por lo que se tiene que tomar
+% una o pasar de turno.
+%conHijos([]):-
+%   write("Sin fichas disponibles").
+
+
+% Predicado que determina si el �rbol generado no es vac�o, si es as�,
+% continua con el resto del m�todo.
+%conHijos(_).
+
+
+
 
 
 
