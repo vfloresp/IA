@@ -151,14 +151,23 @@ forEachBeta(MisPiezas,Incognitas,Abiertas,[Child1|Children],Depth,Alpha,Beta,Val
     min(NValueRet,ValorAlphaBeta,ValorMax),
     min([Child1,Alpha],ValorMax,ValueRet),!.
 
-eliminaPieza([[X,Y],ColaIni],[ElimX,ElimY],Resultado):-
+eliminaPieza([[[X,Y],Var]|ColaIni],[[ElimX,ElimY]|_],Resultado):-
     (X=:=ElimX->
         (Y=:=ElimY->
-            Resultado = ColaIni,
-            );
+            Resultado = ColaIni,!)
         );
-    eliminaPieza(ColaIni,Eliminar,ColaRes),
-    Resultado = [[X,Y],ColaRes].
+    eliminaPieza(ColaIni,[[ElimX,ElimY]|_],ColaRes),
+    Resultado = [[[X,Y],Var]|ColaRes].
+
+nuevaAbiertas([X,Y],[[Z,W]|_],Resultado):-
+    (X=:=Z->
+        Resultado=[Y,W],!);
+    (Y=:=Z->
+        Resultado=[X,W],!);
+    (X=:=W->
+        Resultado=[Y,Z],!);
+    (Y=:=W->
+        Resultado=[X,Z],!).
 
 
 %Predicado que elige el m�ximo entre dos valores dados como nodos.
