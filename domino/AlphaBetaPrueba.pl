@@ -94,17 +94,19 @@ alphaBeta(MisPiezas,Incognitas,Abiertas, [Head|[]],Depth,Alpha,Beta,0,ValorH,Fco
 
 
 %Poda la rama sobrante del �rbol (creo que tampoco lo usamos Gabs)
-forEachAlpha(_,_,_,_,_,Alpha,Beta,_,_,_):-
-    Alpha >= Beta,fail.
+%forEachAlpha(_,_,_,_,_,Alpha,Beta,_,_,_):-
+%    Alpha >= Beta,fail.
 
 % �ltimo forEach realizado para la b�squeda, entra a este m�todo cuando
 % solo queda un nodo por explorar y por eso solo llama una vez a
 % childrenMax
-forEachAlpha(MisPiezas,Incognitas,Abiertas,[Child1|[]],Depth,Alpha,Beta,_,Fcont,ValueRet):-
+forEachAlpha(MisPiezas,Incognitas,Abiertas,[Child1|[]],Depth,Alpha,NAlpha,ValorH,Fcont,ValueRet):-
     eliminaPieza(MisPiezas,Child1,MisPiezasN),
     nuevaAbiertas(Abiertas,Child1,AbiertasN),
-    Ndepth is Depth -1,
-    alphaBeta(MisPiezasN,Incognitas,AbiertasN,[Child1|[]],Ndepth,Alpha,Beta,0,ValueRet,Fcont).
+    Ndepth is Depth-1,
+    alphaBeta(MisPiezasN,Incognitas,AbiertasN,[Child1|[]],Ndepth,Alpha,NAlpha,0,ValorAlphaBeta,Fcont),
+    max(ValorH,ValorAlphaBeta,ValueRet),
+    max([Child1,Alpha],ValueRet,NAlpha),!.
 
 % El forEach de Alpha manda a llamar a childrenMax para empezar a
 % maximizar. Le manda el �rbol generado anteriormente con las posibles
@@ -120,36 +122,36 @@ forEachAlpha(MisPiezas,Incognitas,Abiertas,[Child1|Children],Depth,Alpha,Beta,Va
 
 
 %Poda la rama sobrante del �rbol
-forEachBeta(_,_,_,_,_,Alpha,Beta,_,_,_):-
-    Alpha >= Beta,fail.
+%forEachBeta(_,_,_,_,_,Alpha,Beta,_,_,_):-
+%    Alpha >= Beta,fail.
 
 
 % �ltimo forEach de Beta realizado para la b�squeda, entra a este m�todo
 % cuando solo queda un nodo por explorar y por eso solo llama una vez a
 % childrenMin
-forEachBeta(MisPiezas,Incognitas,Abiertas,[Child1|[]],Depth,Alpha,Nalpha,ValorH,Fcont,ValueRet):-
-    eliminaPieza(MisPiezas,Child1,MisPiezasN),
+forEachBeta(MisPiezas,Incognitas,Abiertas,[Child1|[]],Depth,NBeta,Beta,ValorH,Fcont,ValueRet):-
+    eliminaPieza(Incognitas,Child1,NIncognitas),
     nuevaAbiertas(Abiertas,Child1,AbiertasN),
     Ndepth is Depth-1,
     Nfcont is Fcont-1,
-    alphaBeta(MisPiezasN,Incognitas,AbiertasN,[Child1|[]],Ndepth,Alpha,Beta,1,ValorAlphaBeta,Nfcont),
-    min(ValorH,ValorAlphaBeta,Nalpha),
-    min([Child1,Alpha],Nalpha,ValueRet),!.
+    alphaBeta(MisPiezas,NIncognitas,AbiertasN,[Child1|[]],Ndepth,_,_,1,ValorAlphaBeta,Nfcont),
+    min(ValorH,ValorAlphaBeta,ValueRet),
+    min([Child1,Beta],ValueRet,NBeta),!.
 
 
 % El forEach de Beta manda a llamar a childrenMin para empezar a
 % minimizar. Le manda el �rbol generado anteriormente con las posibles
 % fichas que puede tirar, es decir, las que coinciden con los puntos
 % abiertos del juego.
-forEachBeta(MisPiezas,Incognitas,Abiertas,[Child1|Children],Depth,Alpha,Beta,ValorH,Fcont,ValueRet):-
-    forEachBeta(MisPiezas,Incognitas,Abiertas,Children,Depth,Alpha,Nalpha,ValorH,Fcont,NValueRet),
-    eliminaPieza(MisPiezas,Child1,MisPiezasN),
+forEachBeta(MisPiezas,Incognitas,Abiertas,[Child1|Children],Depth,NBeta,Beta,ValorH,Fcont,ValueRet):-
+    forEachBeta(MisPiezas,Incognitas,Abiertas,Children,Depth,BetaTemp,Beta,ValorH,Fcont,NValueRet),
+    eliminaPieza(Incognitas,Child1,Nincognitas),
     nuevaAbiertas(Abiertas,Child1,AbiertasN),
     Ndepth is Depth-1,
     Nfcont is Fcont-1,
-    alphaBeta(MisPiezasN,Incognitas,AbiertasN,[Child1|[]],Ndepth,Nalpha,Beta,1,ValorAlphaBeta,Nfcont),
-    min(NValueRet,ValorAlphaBeta,ValorMax),
-    min([Child1,Alpha],ValorMax,ValueRet),!.
+    alphaBeta(MisPiezas,Nincognitas,AbiertasN,[Child1|[]],Ndepth,BetaTemp,NBeta,1,ValorAlphaBeta,Nfcont),
+    min(NValueRet,ValorAlphaBeta,ValueRet),
+    min([Child1,BetaTemp],ValueRet,NBeta),!.
 
 eliminaPieza([[[X,Y],Var]|ColaIni],[[ElimX,ElimY]|_],Resultado):-
     (X=:=ElimX->
