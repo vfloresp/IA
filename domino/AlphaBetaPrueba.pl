@@ -14,7 +14,7 @@
 % En este m�todo se asignan los pesos de cada ficha, en
 % nuestro caso fue sumar ambos n�meros de la ficha de dommin� y darle un
 % peso mayor si es mula.
-alphaBeta([],_,_,Nodo,_,_,_,_,ValorH,_):-
+/* alphaBeta([],_,_,Nodo,_,_,_,_,ValorH,_):-
     Nodo = [[Num1,Num2]|_],
     (Num1=:=Num2 ->
     Peso is Num1+Num2+13,
@@ -24,7 +24,7 @@ alphaBeta([],_,_,Nodo,_,_,_,_,ValorH,_):-
     Nodo = [[Num1,Num2]|_],
     (Num1=\=Num2 -> Peso is Num1+Num2,
     Nnodo = [[Num1, Num2],Peso],
-    ValorH = Nnodo,!).
+    ValorH = Nnodo,!). */
 
 % Predicado al que entra el m�todo alphaBeta cuando la profundidad del
 % �rbol a analizar es cero, es decir, nos encontramos en un nodo hoja.
@@ -74,7 +74,9 @@ alphaBeta(MisPiezas,Incognitas,Abiertas, [Head|[]],Depth,Alpha,Beta,1,ValorH,Fco
 alphaBeta(MisPiezas,Incognitas,Abiertas, [],Depth,Alpha,Beta,1,ValorH,Fcont):-
     generaArbol(Incognitas,Abiertas,Hijos),
     append([Abiertas],Hijos,Arbol),
-    forEachAlpha(MisPiezas,Incognitas,Abiertas,Arbol,Depth,Alpha,Beta,ValorH,Fcont,ValorH).
+    nb_setval(alpha,Alpha),
+    nb_setval(beta,Beta),
+    forEachAlpha(MisPiezas,Incognitas,Abiertas,Arbol,Depth,Alpha,Beta,ValorH,Fcont,-5000).
 
 
 % Predicado al que entra el c�digo cuando analiza la mejor opci�n que
@@ -105,8 +107,8 @@ forEachAlpha(MisPiezas,Incognitas,Abiertas,[Child1|[]],Depth,Alpha,NAlpha,ValorH
     nuevaAbiertas(Abiertas,Child1,AbiertasN),
     Ndepth is Depth-1,
     alphaBeta(MisPiezasN,Incognitas,AbiertasN,[Child1|[]],Ndepth,Alpha,NAlpha,0,ValorAlphaBeta,Fcont),
-    max(ValorH,ValorAlphaBeta,ValueRet),
-    max([Child1,Alpha],ValueRet,NAlpha),!.
+    max([Child1,ValueRet],ValorAlphaBeta,ValorH),
+    max([Child1,Alpha],ValorH,NAlpha),!.
 
 % El forEach de Alpha manda a llamar a childrenMax para empezar a
 % maximizar. Le manda el �rbol generado anteriormente con las posibles
@@ -117,13 +119,11 @@ forEachAlpha(MisPiezas,Incognitas,Abiertas,[Child1|Children],Depth,Alpha,Beta,Va
     eliminaPieza(MisPiezas,Child1,MisPiezasN),
     nuevaAbiertas(Abiertas,Child1,AbiertasN),
     Ndepth is Depth-1,
-    alphaBeta(MisPiezasN,Incognitas,AbiertasN,[Child1|[]],Ndepth,Alpha,Beta,0,ValueRet,Fcont),
-    forEachAlpha(MisPiezas,Incognitas,Abiertas,Children,Depth,Alpha,Beta,ValorH,Fcont,ValueRet),!.
+    alphaBeta(MisPiezasN,Incognitas,AbiertasN,[Child1|[]],Ndepth,-5000,5000,0,ValorAlphaBeta,Fcont),
+    forEachAlpha(MisPiezas,Incognitas,Abiertas,Children,Depth,Alpha,Beta,ValorH,Fcont,ValueRet2),
+    max([Child1,ValueRet2],ValorAlphaBeta,ValorH),
+    max([Child1,Alpha],ValorH,ValueRet),!.
 
-
-%Poda la rama sobrante del �rbol
-%forEachBeta(_,_,_,_,_,Alpha,Beta,_,_,_):-
-%    Alpha >= Beta,fail.
 
 
 % �ltimo forEach de Beta realizado para la b�squeda, entra a este m�todo
@@ -152,6 +152,11 @@ forEachBeta(MisPiezas,Incognitas,Abiertas,[Child1|Children],Depth,NBeta,Beta,Val
     alphaBeta(MisPiezas,Nincognitas,AbiertasN,[Child1|[]],Ndepth,BetaTemp,NBeta,1,ValorAlphaBeta,Nfcont),
     min(NValueRet,ValorAlphaBeta,ValueRet),
     min([Child1,BetaTemp],ValueRet,NBeta),!.
+
+%Poda la rama sobrante del �rbol
+%forEachBeta(_,_,_,_,_,Alpha,Beta,_,_,_):-
+%    Alpha >= Beta,fail.
+
 
 eliminaPieza([[[X,Y],Var]|ColaIni],[[ElimX,ElimY]|_],Resultado):-
     (X=:=ElimX->
