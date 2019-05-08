@@ -1,0 +1,89 @@
+
+@font-face {
+    font-family: 'fugaz_oneregular';
+    src: url('../fonts/fugaz.one/fugazone-regular-webfont.woff2') format('woff2'),
+         url('../fonts/fugaz.one/fugazone-regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+h1 {
+    font-family: 'fugaz_oneregular', Arial, sans-serif;
+    color: white;
+    text-align: center;
+    font-size: 60px;
+}
+h2{
+    font-family: 'fugaz_oneregular', Arial, sans-serif;
+    color: #314455;
+    text-align: center;
+    font-size: 30px;
+    margin: 40px;
+    margin-left: 100px;
+    margin-right: 100px;
+}
+
+input{
+  size: 800px;
+}
+
+#searchBar{
+  text-align: center;
+}
+
+button{
+  background-color: #97AABD;
+}
+
+body {
+  font: 14px "Century Gothic", Futura, sans-serif;
+  margin: 20px;
+  background-color: #C96567;
+}
+
+ol, ul {
+  padding-left: 30px;
+}
+
+.board-row:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+
+.status {
+  margin-bottom: 10px;
+}
+
+.square {
+  background: #fff;
+  border: 1px solid #999;
+  float: left;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 34px;
+  height: 34px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 34px;
+}
+
+.square:focus {
+  outline: none;
+}
+
+.kbd-navigation .square:focus {
+  background: #ddd;
+}
+
+.game {
+  display: flex;
+  flex-direction: row;
+}
+
+.game-info {
+  margin-left: 20px;
+}
