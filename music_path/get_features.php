@@ -34,14 +34,13 @@
 
     $features = array();
     for($i=0;$i<sizeof($json_response->audio_features);$i++){
-        $songf->danceability = $json_response->audio_features[$i]->danceability;
-        /*$songf->energy = $json_response->audio_features[$i]->energy;
-        $songf->acousticness = $json_response->audio_features[$i]->acousticness;
-        $songf->valence = $json_response->audio_features[$i]->valence;
-        $songf->tempo = $json_response->audio_features[$i]->tempo;
-        $songf->instrumentalness = $json_response->audio_features[$i]->instrumentalness;
-        $songf->id = $json_response->audio_features[$i]->id;*/
-        arrray_push($features,$songf); 
+        $features[$i]->danceability = $json_response->audio_features[$i]->danceability;
+        $features[$i]->energy = $json_response->audio_features[$i]->energy;
+        $features[$i]->acousticness = $json_response->audio_features[$i]->acousticness;
+        $features[$i]->valence = $json_response->audio_features[$i]->valence;
+        $features[$i]->tempo = $json_response->audio_features[$i]->tempo;
+        $features[$i]->instrumentalness = $json_response->audio_features[$i]->instrumentalness;
+        $features[$i]->id = $json_response->audio_features[$i]->id;
     };
 
     $featuresJSON = (object) $features;
