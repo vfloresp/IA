@@ -43,8 +43,8 @@
       $songsArray[$i]->image_url = $json_songs[$i]->album->images[0]->url;
     } 
 
-    $songsJSON = (object) $songsArray;
+    $songsJSON->canciones = $songsArray;
 
     // regresamos los datos 
-    print_r($songsJSON);
+    print_r(json_encode($songsJSON));
 ?>

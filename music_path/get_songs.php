@@ -46,8 +46,9 @@
       if($id != $data->track_id) 
         array_push($idArray,$id);
     } 
-    $idJSON = (object) $idArray;
+    //$idJSON = (object) $idArray;
+    $idJSON->ids = $idArray;
 
     // regresamos los datos 
-    print_r($idJSON);
+    print_r(json_encode($idJSON));
 ?>

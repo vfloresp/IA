@@ -43,10 +43,10 @@
         $features[$i]->id = $json_response->audio_features[$i]->id;
     };
 
-    $featuresJSON = (object) $features;
-
+    //$featuresJSON = (object) $features;
+    $featuresJSON->features = $features;
 
 
     // regresamos los datos 
-    print_r($featuresJSON);
+    print_r(json_encode($featuresJSON));
 ?>

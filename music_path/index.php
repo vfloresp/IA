@@ -11,26 +11,38 @@
     <h1>Music Path</h1>
     <h2>Encuentra la transición perfecta entre cualquier par de canciones,
        solo selecciona tu canción de inicio, canción de fin y listo.</h2>
-    <div id="searchBar"></div>
-    <div class="row" style="text-align:center;">
+    <!-- <div id="searchBar"></div> -->
+    <div class="row justify-content-center">
         <div class="col-md-6">
-            <div id="canIni"></div>
-        </div>
-        <div class="col-md-6">
-            <div id="canIni"></div>
+            <input type="text" class="form-control" placeholder="id de inicio" aria-label="Recipient's username" id="idIni"/>
         </div>
     </div>
+    <br></br>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <input type="text" class="form-control" placeholder="id de fin" aria-label="Recipient's username" id="idFin"/>
+        </div>
+    </div>
+    <br></br>
+    <div class="row justify-content-center">
+        <div class="col-md-6 justify-content-center" style="text-align: center">
+            <button type="button" class="btn btn-primary" id="button_busqueda" style="background-color:#314455">Buscar</button>
+        </div>
+    </div>
+    
         
+
+
     <!-- Load React. -->
     <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
     <!-- Load our React component. -->
-    <script type="text/babel" src="src/search_bar.js"></script>
+    <!-- <script type="text/babel" src="src/search_bar.js"></script> -->
     <!-- <script type="text/babel" src="src/selected_song.js"></script> -->
     <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <!-- <script src="index.js"></script> -->
+    <script src="index.js"></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <meta charset="utf-8">
     <?php
