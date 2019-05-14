@@ -14,12 +14,12 @@
 
     $idFin = $data->idFin;
     $grafo = "[";
-    for($i=0;$i<sizeof($data->elem);$i++){
-        $grafo .= "['".$data->elem[$i]->id. "',";
-        $grafo .= $data->elem[$i]->valorH. ",";
-        for($j=0;$j<sizeof($data->elem[$i]->vecinos);$j++){
-            $grafo .= "['".$data->elem[$i]->vecinos[$j]->id."',";
-            $grafo .= $data->elem[$i]->vecinos[$j]->distancia."],";
+    for($i=0;$i<sizeof($data->graph);$i++){
+        $grafo .= "['".$data->graph[$i][0]. "',";
+        $grafo .= $data->graph[$i][1]. ",";
+        for($j=0;$j<sizeof($data->graph[$i][2]);$j++){
+            $grafo .= "['".$data->graph[$i][2][$j][0]."',";
+            $grafo .= $data->graph[$i][2][$j][1]."],";
         }
         $grafo = substr($grafo,0,-1);
         $grafo .= "],";
@@ -31,10 +31,10 @@
     
     $cmd = "swipl -f /var/www/html/music_path/AEstrella.pl -g 'aEstrella('".$idFin."',".$grafo.")',halt";
 
-    print_r($cmd);
+    //print_r($cmd);
     exec( $cmd, $output );
-    $output = $output[0];
-    $output = substr($output,1,-1);
+    //$output = $output[0];
+    //$output = substr($output,1,-1);
 
     $listaArray = array();
     /*for($k=0;$k<sizeof($output)-2;$k++){
@@ -54,8 +54,7 @@
         $output = substr($output,strpos($output,"]")+2);
         $i++;
     }*/
-
-    print_r(json_encode({"resultado":$listaArray}) );
-
-   
+    $res->resultado=$listaArray;
+    print_r(json_encode($output));
+  
 ?> 

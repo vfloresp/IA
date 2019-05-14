@@ -30,8 +30,8 @@ checarInt(Rand4, Instrumentalness, NInst,_):-
 sí modifique el gen de Instrumentalness*/
 checarInt(Rand4, Instrumentalness, NInst, Signo):-
 	Rand4 >= 0.5,
-	(Signo =:= -1 -> NInst is Instrumentalness - 0.15;
-					 NInst is Instrumentalness + 0.15).
+	(Signo =:= -1 -> NInst is Instrumentalness - 0.1;
+					 NInst is Instrumentalness + 0.1).
 
 /*Verifica que el valor aleatorio asignado sea un 1 para que 
 no modifique el gen de Acousticness*/
@@ -43,8 +43,8 @@ checarAc(Rand3, Acousticness, NAcou,_):-
 sí modifique el gen de Acousticness*/
 checarAc(Rand3, Acousticness, NAcou,Signo):-
 	Rand3 >= 0.5,
-	(Signo =:= -1 -> NAcou is Acousticness - 0.08;
-					 NAcou is Acousticness + 0.08).
+	(Signo =:= -1 -> NAcou is Acousticness - 0.05;
+					 NAcou is Acousticness + 0.05).
 
 /*Verifica que el valor aleatorio asignado sea un 1 para que 
 no modifique el gen de Energy*/
@@ -68,8 +68,8 @@ checarDance(Rand1,Danceability, NDanc,_):-
 sí modifique el gen de Danceability*/
 checarDance(Rand1,Danceability, NDanc,Signo):-
 	Rand1 >= 0.5,
-	(Signo =:= -1 -> NDanc is Danceability - 0.06;
-					 NDanc is Danceability + 0.06).
+	(Signo =:= -1 -> NDanc is Danceability - 0.03;
+					 NDanc is Danceability + 0.03).
 
 /*Compara el gen de Danceability de la canción actual con la 
 canción final. Verifica que esté en el rango para ser modificada*/

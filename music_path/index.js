@@ -44,10 +44,8 @@ $('#button_busqueda').click(function(){
         $.post("http://95.216.205.0/music_path/get_songs.php",JSON.stringify(seed),function(recom){
           jsonRecom = JSON.parse(recom);
           songs.push(jsonRecom.ids);
-          //console.log(JSON.parse(data));
           if(jsonData2.length-1==aux){
-            var delayInMilliseconds = 100; //1 second
-
+            var delayInMilliseconds = 100; 
             setTimeout(function() {
               constGrafo();
             }, delayInMilliseconds);
@@ -60,49 +58,67 @@ $('#button_busqueda').click(function(){
 });
 
 function constGrafo(){
-  //console.log(songs);
   songIds= new Array();
-  //console.log(songs);
   for(var i = 0; i<songs.length;i++){
     for(var j = 0;j<songs[i].length;j++){
       songIds.push(songs[i][j]);
     }
   }
-  //console.log(songIds);
+  uniqueIds = new Array();
+  $.each(songIds, function(i, el){
+    if($.inArray(el, uniqueIds) === -1) uniqueIds.push(el);
+  });
   var param={
     "token":$(".token").text(),
-    "ids":songIds
+    "ids":uniqueIds
   }
   $.post("http://95.216.205.0/music_path/get_features.php",JSON.stringify(param),function(nodes){
           var grafo = new Array();
           jsonNodes = JSON.parse(nodes);
-          var finPos = getIndex(jsonNodes.features);
-          console.log(finPos);
-          /*for(var i=0;i<jsonNodes.features.length;i+4){
-            for(var j=0;j<4;i++){
-              var hijos = new Array();
-              for(var k=0;k<4;k++){
-                if((i+4+k)<jsonNodes.features.length){
-                  var danceability = Math.pow(jsonNodes.features[i+j].danceability-jsonNodes.features[i+4+k].danceability,2);
-                  var energy = Math.pow(jsonNodes.features[i+j].energy-jsonNodes.features[i+4+k].energy,2);
-                  var acousticness = Math.pow(jsonNodes.features[i+j].acousticness-jsonNodes.features[i+4+k].acousticness,2);
-                  var instrumentalness = Math.pow(jsonNodes.features[i+j].instrumentalness-jsonNodes.features[i+4+k].instrumentalness,2);
-                  var valence = Math.pow(jsonNodes.features[i+j].valence-jsonNodes.features[i+4+k].valence,2);
-                  hijos.push([jsonNodes.features[i+4+k].id,Math.sqrt(danceability+energy+acousticness+instrumentalness+valence)])
-                }
-              }
-              if((i+j)<jsonNodes.features.length){
-                var danceabilityH = Math.pow(jsonNodes.features[i+j].danceability-jsonNodes.features[finPos].danceability,2);
-                var energyH = Math.pow(jsonNodes.features[i+j].energy-jsonNodes.features[finPos].energy,2);
-                var acousticnessH = Math.pow(jsonNodes.features[i+j].acousticness-jsonNodes.features[finPos].acousticness,2);
-                var instrumentalnessH = Math.pow(jsonNodes.features[i+j].instrumentalness-jsonNodes.features[finPos].instrumentalness,2);
-                var valenceH = Math.pow(jsonNodes.features[i+j].valence-jsonNodes.features[finPos].valence,2);
-                valorH = Math.sqrt(danceabilityH+energyH+acousticnessH+instrumentalnessH+valenceH);
-                grafo.push([jsonNodes.features[i+j].id,valorH,hijos]);
+          var posFin = getIndex(jsonNodes.features);
+          for(var i=0;i<jsonNodes.features.length;i++){
+            var hijos = new Array();
+            for(var j=0;j<jsonNodes.features.length;j++){
+              if(i!=j){
+                var danceabilityD = Math.pow((jsonNodes.features[i].danceability-jsonNodes.features[j].danceability),2);
+                var energyD = Math.pow((jsonNodes.features[i].energy-jsonNodes.features[j].energy),2);
+                var acousticnessD = Math.pow((jsonNodes.features[i].acousticness-jsonNodes.features[j].acousticness),2);
+                var instrumentalnessD = Math.pow((jsonNodes.features[i].instrumentalness-jsonNodes.features[j].instrumentalness),2);
+                var valenceD = Math.pow((jsonNodes.features[i].valence-jsonNodes.features[j].valence),2);
+                var distancia = Math.sqrt(danceabilityD+energyD+acousticnessD+instrumentalnessD+valenceD).toFixed(3);
+                if(distancia<=0.2)
+                  hijos.push([jsonNodes.features[j].id,distancia]);
               }
             }
-          }*/
+            var danceabilityH = Math.pow((jsonNodes.features[i].danceability-jsonNodes.features[posFin].danceability),2);
+            var energyH = Math.pow((jsonNodes.features[i].energy-jsonNodes.features[posFin].energy),2);
+            var acousticnessH = Math.pow((jsonNodes.features[i].acousticness-jsonNodes.features[posFin].acousticness),2);
+            var instrumentalnessH = Math.pow((jsonNodes.features[i].instrumentalness-jsonNodes.features[posFin].instrumentalness),2);
+            var valenceH = Math.pow((jsonNodes.features[i].valence-jsonNodes.features[posFin].valence),2);
+            var tempoH =  Math.pow((jsonNodes.features[i].tempo-jsonNodes.features[posFin].tempo),2);
+            var valorH = Math.sqrt(danceabilityH+energyH+acousticnessH+instrumentalnessH+valenceH+tempoH).toFixed(3);
+            grafo.push([jsonNodes.features[i].id,valorH,hijos]);
+          }
+          var graphOrd = new Array();
+          //var indIni = findNeedle(grafo,idIni);
+          //graphOrd[0] = grafo[indIni];
+          //grafo =grafo.splice(indIni,1);
+          var indFin = findNeedle(grafo,idFin);
+          var auxFin = grafo[indFin];
+          grafo.splice(indFin,1);
           console.log(grafo);
+          graphOrd.push(quickSort(grafo));
+          console.log(graphOrd);
+          graphOrd.push(auxFin);
+          pob={
+            "idFin":idFin,
+            "graph":graphOrd
+          }
+          //console.log(graphOrd);
+          $.post("http://95.216.205.0/music_path/get_Aestrella.php",JSON.stringify(pob),function(listaRes){
+              console.log(listaRes);
+          }),"json";
+
         }),"json";
 
 }
@@ -114,3 +130,36 @@ function getIndex(elemArray){
   }
   return aux;
 }
+
+function findNeedle(elemArray,needle){
+  var aux = 0;
+  while(elemArray[aux][0]!=needle){
+    aux++;
+  }
+  return aux;
+}
+
+function quickSort(origArray){
+  if (origArray.length <= 1) { 
+		return origArray;
+	} else {
+    var left = [];
+    var right = [];
+    var newArray = [];
+    var pivotAux = origArray.pop();
+    if(pivotAux != undefined)
+      var pivot = pivotAux[1];
+    var length = origArray.length;
+
+    for (var i = 0; i < length; i++) {
+      if (origArray[i][1] >= pivot) {
+        left.push(origArray[i]);
+      } else {
+        right.push(origArray[i]);
+      }
+    }
+
+    return newArray.concat(quickSort(left), pivot, quickSort(right));
+  }
+}
+

@@ -6,7 +6,7 @@
     $json = file_get_contents('php://input');
     $data = json_decode($json);
 
-    $limit = "4";
+    $limit = "10";
     $id = $data->track_id;
     $danceability = $data->danceability;
     $energy = $data->energy;
