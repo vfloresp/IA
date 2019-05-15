@@ -106,9 +106,10 @@ function constGrafo(){
           var indFin = findNeedle(grafo,idFin);
           var auxFin = grafo[indFin];
           grafo.splice(indFin,1);
-          console.log(grafo);
+          //console.log(grafo.pop());
+          console.log(quickSort(grafo));
           graphOrd.push(quickSort(grafo));
-          console.log(graphOrd);
+          //console.log(graphOrd);
           graphOrd.push(auxFin);
           pob={
             "idFin":idFin,
@@ -140,25 +141,23 @@ function findNeedle(elemArray,needle){
 }
 
 function quickSort(origArray){
-  if (origArray.length <= 1) { 
+  if (typeof origArray[0][0] == "string" || origArray.length == 1) { 
 		return origArray;
 	} else {
     var left = [];
     var right = [];
     var newArray = [];
-    var pivotAux = origArray.pop();
-    if(pivotAux != undefined)
-      var pivot = pivotAux[1];
+    var pivot = origArray.pop();
     var length = origArray.length;
 
     for (var i = 0; i < length; i++) {
-      if (origArray[i][1] >= pivot) {
+      if (parseFloat(origArray[i][1]) >= parseFloat(pivot[1])) {
         left.push(origArray[i]);
       } else {
         right.push(origArray[i]);
       }
+      
     }
-
     return newArray.concat(quickSort(left), pivot, quickSort(right));
   }
 }
