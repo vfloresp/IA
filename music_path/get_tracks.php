@@ -6,17 +6,25 @@
     $json = file_get_contents('php://input');
     $data = json_decode($json);
 
-    $parameter = $data->search;
-    $parameter = str_replace(' ', '%20', $parameter);
+    /*$limit = "10";
+    $id = $data->track_id;
+    $danceability = $data->danceability;
+    $energy = $data->energy;
+    $acousticness = $data->acousticness;
+    $instrumentalness = $data->instrumentalness;
+    $valence = $data->valence;*/
+    $ids = $data->ids;
+    $parametros = '?ids=';
+    for($m=0; $m<sizeof($ids) ; $m++){
+        $parametros.=$ids[$m].',';
+    }
+    $parametros = substr($parametros,0,-1);
+
      // abrimos la sesión cURL
     $ch = curl_init();
-
-    // definimos cada uno de los parámetros
-    $parametros = "?q=".$parameter.'&type=track&limit=7';
-
-
-    // definimos la URL a la que hacemos la petición
-    curl_setopt($ch, CURLOPT_URL,"https://api.spotify.com/v1/search".$parametros);
+    
+      // definimos la URL a la que hacemos la petición
+    curl_setopt($ch, CURLOPT_URL,"https://api.spotify.com/v1/tracks".$parametros);
 
     // definimos los headers
     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
@@ -33,7 +41,7 @@
     curl_close($ch);
 
     $json_response = json_decode($remote_server_output);
-    $json_songs = $json_response->tracks->items;
+    $json_songs = $json_response->tracks;
 
     $songsArray = array();
     for($i=0;$i<sizeof($json_songs);$i++){
@@ -46,5 +54,6 @@
     $songsJSON->canciones = $songsArray;
 
     // regresamos los datos 
+    //print_r(json_encode($json_response));
     print_r(json_encode($songsJSON));
 ?>

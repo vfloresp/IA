@@ -64,10 +64,13 @@ function constGrafo(){
       songIds.push(songs[i][j]);
     }
   }
+  //songIds.push(idIni);
+  //console.log(songIds);
   uniqueIds = new Array();
   $.each(songIds, function(i, el){
     if($.inArray(el, uniqueIds) === -1) uniqueIds.push(el);
   });
+  
   var param={
     "token":$(".token").text(),
     "ids":uniqueIds
@@ -75,10 +78,11 @@ function constGrafo(){
   $.post("http://95.216.205.0/music_path/get_features.php",JSON.stringify(param),function(nodes){
           var grafo = new Array();
           jsonNodes = JSON.parse(nodes);
+          //console.log(jsonNodes);
           var posFin = getIndex(jsonNodes.features);
           for(var i=0;i<jsonNodes.features.length;i++){
             var hijos = new Array();
-            for(var j=0;j<jsonNodes.features.length;j++){
+            /*for(var j=0;j<jsonNodes.features.length;j++){
               if(i!=j){
                 var danceabilityD = Math.pow((jsonNodes.features[i].danceability-jsonNodes.features[j].danceability),2);
                 var energyD = Math.pow((jsonNodes.features[i].energy-jsonNodes.features[j].energy),2);
@@ -89,7 +93,7 @@ function constGrafo(){
                 if(distancia<=0.2)
                   hijos.push([jsonNodes.features[j].id,distancia]);
               }
-            }
+            }*/
             var danceabilityH = Math.pow((jsonNodes.features[i].danceability-jsonNodes.features[posFin].danceability),2);
             var energyH = Math.pow((jsonNodes.features[i].energy-jsonNodes.features[posFin].energy),2);
             var acousticnessH = Math.pow((jsonNodes.features[i].acousticness-jsonNodes.features[posFin].acousticness),2);
@@ -97,31 +101,77 @@ function constGrafo(){
             var valenceH = Math.pow((jsonNodes.features[i].valence-jsonNodes.features[posFin].valence),2);
             var tempoH =  Math.pow((jsonNodes.features[i].tempo-jsonNodes.features[posFin].tempo),2);
             var valorH = Math.sqrt(danceabilityH+energyH+acousticnessH+instrumentalnessH+valenceH+tempoH).toFixed(3);
-            grafo.push([jsonNodes.features[i].id,valorH,hijos]);
+            grafo.push([jsonNodes.features[i].id,valorH]);
+            //console.log(i);
+            //console.log(jsonNodes.features[i].id);
+            //console.log(grafo);
           }
           var graphOrd = new Array();
+          //console.log(grafo);
+          //console.log(idIni);
           //var indIni = findNeedle(grafo,idIni);
-          //graphOrd[0] = grafo[indIni];
+          //graphOrd[0] = [idIni,100];
           //grafo =grafo.splice(indIni,1);
           var indFin = findNeedle(grafo,idFin);
           var auxFin = grafo[indFin];
           grafo.splice(indFin,1);
-          //console.log(grafo.pop());
-          console.log(quickSort(grafo));
-          graphOrd.push(quickSort(grafo));
+          graphOrd=quickSort(grafo);
           //console.log(graphOrd);
-          graphOrd.push(auxFin);
-          pob={
+          //graphOrd.push(auxFin);
+          var graphIds = new Array();
+          var aux = 0;
+          for(var i=0;i<graphOrd.length;i+=2){
+            graphIds[aux]=graphOrd[i];
+            aux++;
+          }
+          
+          var graphFinal = new Array();
+          graphFinal[0] = idIni;
+          max = Math.floor(graphIds.length/2);
+          min = Math.floor(graphIds.length/4);
+          var nSOngs = getRandomInt(min,max);
+          var augment=Math.floor(graphIds.length/nSOngs);
+          var auxAug = augment;
+          for(var n=1;n<=nSOngs;n++){
+            if(graphIds[auxAug]!=idIni && graphIds[auxAug]!=idFin)
+              graphFinal[n]=graphIds[auxAug];
+            auxAug += augment;
+          }
+          graphFinal.push(idFin);
+          //console.log(graphFinal);
+          listaFin={
+            token:$(".token").text(),
+            ids:graphFinal
+          }
+          $.post("http://95.216.205.0/music_path/get_tracks.php",JSON.stringify(listaFin),function(listaRes){
+              jsonRes = JSON.parse(listaRes);
+              var html = '<br>';
+              for(var m=0;m<jsonRes.canciones.length;m++){
+                html+='<div class="cancion">';
+                html+='<img src="'+jsonRes.canciones[m].image_url+'" height="50" width="50">'+"  "+jsonRes.canciones[m].name+' - '+jsonRes.canciones[m].artist;
+                html+='</div><br>';
+
+              }
+              $('#ListaCanciones').append(html);
+          }),"json";
+
+          /*pob={
             "idFin":idFin,
             "graph":graphOrd
           }
           //console.log(graphOrd);
           $.post("http://95.216.205.0/music_path/get_Aestrella.php",JSON.stringify(pob),function(listaRes){
               console.log(listaRes);
-          }),"json";
+          }),"json";*/
 
         }),"json";
 
+}
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function getIndex(elemArray){
@@ -141,7 +191,7 @@ function findNeedle(elemArray,needle){
 }
 
 function quickSort(origArray){
-  if (typeof origArray[0][0] == "string" || origArray.length == 1) { 
+  if (origArray.length == 0 || typeof origArray[0] == "string" ) { 
 		return origArray;
 	} else {
     var left = [];
@@ -149,7 +199,6 @@ function quickSort(origArray){
     var newArray = [];
     var pivot = origArray.pop();
     var length = origArray.length;
-
     for (var i = 0; i < length; i++) {
       if (parseFloat(origArray[i][1]) >= parseFloat(pivot[1])) {
         left.push(origArray[i]);

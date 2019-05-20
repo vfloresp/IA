@@ -31,7 +31,7 @@
     
     $cmd = "swipl -f /var/www/html/music_path/AEstrella.pl -g 'aEstrella('".$idFin."',".$grafo.")',halt";
 
-    //print_r($cmd);
+    print_r($cmd);
     exec( $cmd, $output );
     //$output = $output[0];
     //$output = substr($output,1,-1);

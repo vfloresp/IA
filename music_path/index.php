@@ -29,6 +29,11 @@
             <button type="button" class="btn btn-primary" id="button_busqueda" style="background-color:#314455">Buscar</button>
         </div>
     </div>
+    <div class="row justify-content-center">
+        <div class="col-md-6 justify-content-center" id="ListaCanciones" style="text-align: center">
+            
+        </div>
+    </div>
     
         
 

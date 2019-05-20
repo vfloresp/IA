@@ -46,6 +46,12 @@ ol, ul {
   padding-left: 30px;
 }
 
+.cancion{
+  background-color: #644E5B;
+  color:white;
+  font-size: 20px;
+}
+
 .board-row:after {
   clear: both;
   content: "";
